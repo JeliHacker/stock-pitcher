@@ -41,7 +41,7 @@ const StockSwiper = () => {
 const styles = {
   card: {
     flex: 1,
-    borderRadius: 4,
+    borderRadius: 8,
     borderWidth: 2,
     borderColor: '#E8E8E8',
     justifyContent: 'center',

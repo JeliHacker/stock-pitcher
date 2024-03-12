@@ -35,7 +35,12 @@ const AppNavigator = () => {
             },
           })}
       >
-        <Tab.Screen name="Plate" component={PlateScreen} />
+        <Tab.Screen 
+          name="Plate" 
+          component={PlateScreen} 
+          options={{
+            headerTitleAlign: 'left'
+          }}/>
         <Tab.Screen name="Saved" component={SavedScreen} />
       </Tab.Navigator>
     </NavigationContainer>
