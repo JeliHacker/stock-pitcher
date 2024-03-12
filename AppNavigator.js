@@ -3,13 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, Text } from 'react-native';
 import { FontAwesome, FontAwesome6 } from '@expo/vector-icons';
-
-// Dummy components for the screens
-const PlateScreen = () => (
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <Text>Plate</Text>
-  </View>
-);
+import PlateScreen from './PlateScreen'; 
 
 const SavedScreen = () => (
   <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
