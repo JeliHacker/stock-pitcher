@@ -1,0 +1,75 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Production
+/build
+
+# Misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Expo
+.expo/*
+.expo-shared/
+
+# EAS Build
+.eas/
+*.log
+
+# iOS
+ios/Pods/
+ios/*.xcworkspace
+ios/*.xcuserstate
+ios/build/
+ios/*.pbxuser
+ios/*.mode1v3
+ios/*.mode2v3
+ios/*.moved-aside
+ios/*.hmap
+ios/*.ipa
+ios/*.dSYM.zip
+ios/*.dSYM
+
+# Android
+android/.gradle
+android/build
+android/captures
+*.keystore
+*.jks
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+
+# VSCode
+.vscode/
+
+# JetBrains
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# macOS Files
+*.swp
+*.swo
+*.ds_store
+
+# Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
