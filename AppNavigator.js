@@ -4,12 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, Text } from 'react-native';
 import { FontAwesome, FontAwesome6 } from '@expo/vector-icons';
 import PlateScreen from './PlateScreen'; 
-
-const SavedScreen = () => (
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <Text>Saved</Text>
-  </View>
-);
+import SavedScreen from './SavedScreen';
 
 const Tab = createBottomTabNavigator();
 

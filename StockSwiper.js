@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
+import { useSavedStocks } from './SavedStocksContext';
 
 const Card = ({ card }) => (
   <View style={styles.card}>
@@ -23,15 +24,19 @@ const StockSwiper = () => {
     // Add more stock cards as needed
   ]);
 
+  const { saveStock } = useSavedStocks();
+
   return (
     <Swiper
       cards={cards}
       renderCard={(card) => <Card card={card} />}
       onSwipedLeft={() => console.log('Swiped left!')}
-      onSwipedRight={() => console.log('Swiped right!')}
+      onSwipedRight={(cardIndex) => saveStock(cards[cardIndex])}
       onSwipedBottom={() => console.log('Swiped bottom!')}
       onSwipedTop={() => console.log('Swiped top!')}
       cardIndex={0}
+      verticalSwipe={false}
+      cardVerticalMargin={0}
       backgroundColor={'#f0f0f0'}
       stackSize={3} // Number of cards visible in background
     />

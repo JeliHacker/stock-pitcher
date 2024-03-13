@@ -1,9 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import AppNavigator from './AppNavigator';
+import { SavedStocksProvider } from './SavedStocksContext';
 
 export default function App() {
-  return <AppNavigator />;
+  return (
+    <SavedStocksProvider>
+      <AppNavigator />
+    </SavedStocksProvider>
+  );
 }
 
 const styles = StyleSheet.create({
