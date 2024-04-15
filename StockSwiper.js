@@ -1,30 +1,39 @@
-import React, { useState } from 'react';
-import { View, Text } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ActivityIndicator } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
 import { useSavedStocks } from './SavedStocksContext';
 
 const Card = ({ card }) => (
   <View style={styles.card}>
-    <Text style={styles.text}>{card.text}</Text>
+    <Text style={styles.text}>{card.symbol} - {card.name}</Text>
   </View>
 );
 
 const StockSwiper = () => {
-  const [cards, setCards] = useState([
-    { text: 'AAPL' },
-    { text: 'GOOGL' },
-    { text: 'MSFT' },
-    { text: 'AAPL' },
-    { text: 'GOOGL' },
-    { text: 'MSFT' },
-    { text: 'AAPL' },
-    { text: 'GOOGL' },
-    { text: 'MSFT' },
-
-    // Add more stock cards as needed
-  ]);
+  const [cards, setCards] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const { saveStock } = useSavedStocks();
+
+  useEffect(() => {
+    fetch('http://api.codefit.lol/stocks')
+      .then(response => response.json())
+      .then(data => {
+        setCards(data.map(stock => ({
+          symbol: stock.symbol,
+          name: stock.name
+        })));
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('Error fetching stock data:', error);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
 
   return (
     <Swiper
