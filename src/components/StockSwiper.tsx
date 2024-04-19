@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
-import { useSavedStocks } from './SavedStocksContext';
+import { useSavedStocks } from '../contexts/SavedStocksContext';
+import { Stock } from '../types/types'; 
 
-const Card = ({ card }) => (
+
+interface CardProps {
+  card: Stock;
+}
+
+const Card: React.FC<CardProps> = ({ card }) => (
   <View style={styles.card}>
     <Text style={styles.text}>{card.symbol} - {card.name}</Text>
   </View>
@@ -19,7 +25,7 @@ const StockSwiper = () => {
     fetch('http://api.codefit.lol/stocks')
       .then(response => response.json())
       .then(data => {
-        setCards(data.map(stock => ({
+        setCards(data.map((stock:any) => ({
           symbol: stock.symbol,
           name: stock.name
         })));
@@ -40,7 +46,10 @@ const StockSwiper = () => {
       cards={cards}
       renderCard={(card) => <Card card={card} />}
       onSwipedLeft={() => console.log('Swiped left!')}
-      onSwipedRight={(cardIndex) => saveStock(cards[cardIndex])}
+      onSwipedRight={(card) => {
+        console.log("saving card", cards[card]);
+        saveStock(cards[card]);
+      }}
       onSwipedBottom={() => console.log('Swiped bottom!')}
       onSwipedTop={() => console.log('Swiped top!')}
       cardIndex={0}
@@ -52,7 +61,7 @@ const StockSwiper = () => {
   );
 };
 
-const styles = {
+const styles = StyleSheet.create({
   card: {
     flex: 1,
     borderRadius: 8,
@@ -66,6 +75,6 @@ const styles = {
     fontSize: 50,
     backgroundColor: 'transparent',
   },
-};
+});
 
 export default StockSwiper;

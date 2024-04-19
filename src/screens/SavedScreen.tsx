@@ -1,7 +1,7 @@
 // SavedScreen.js
 import React from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
-import { useSavedStocks } from './SavedStocksContext'; // Adjust the path as necessary
+import { useSavedStocks } from '../contexts/SavedStocksContext'; // Adjust the path as necessary
 
 const SavedScreen = () => {
   const { savedStocks } = useSavedStocks();
@@ -10,9 +10,9 @@ const SavedScreen = () => {
     <View style={styles.container}>
       <FlatList
         data={savedStocks}
-        keyExtractor={(item, index) => item.text + index}
+        keyExtractor={(item, index) => item.symbol + index}
         renderItem={({ item }) => (
-          <Text style={styles.stockItem}>{item.text}</Text>
+          <Text style={styles.stockItem}>{item.symbol} - {item.name}</Text>
         )}
       />
     </View>

@@ -3,8 +3,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, Text } from 'react-native';
 import { FontAwesome, FontAwesome6 } from '@expo/vector-icons';
-import PlateScreen from './PlateScreen'; 
-import SavedScreen from './SavedScreen';
+import PlateScreen from './src/screens/PlateScreen'; 
+import SavedScreen from './src/screens/SavedScreen';
 
 const Tab = createBottomTabNavigator();
 
