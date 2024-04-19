@@ -3,7 +3,6 @@ import React, { useLayoutEffect } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import StockSwiper from '../components/StockSwiper'; 
 import { Ionicons } from '@expo/vector-icons'; 
-import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { PlateScreenProps } from '../types/types'; 
 
 

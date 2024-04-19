@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, Dimensions } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
 import { useSavedStocks } from '../contexts/SavedStocksContext';
 import { Stock } from '../types/types'; 
@@ -61,9 +61,15 @@ const StockSwiper = () => {
   );
 };
 
+// Get the full height of the device screen
+const screenHeight = Dimensions.get('window').height;
+
+// Define a percentage of the screen height you want the card to be
+const cardHeight = screenHeight * 0.75; // for 75% of the screen height
+
 const styles = StyleSheet.create({
   card: {
-    flex: 1,
+    height: cardHeight,
     borderRadius: 8,
     borderWidth: 2,
     borderColor: '#E8E8E8',
