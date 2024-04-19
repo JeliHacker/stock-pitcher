@@ -6,7 +6,8 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "build": "tsc"
   },
   "dependencies": {
     "@react-navigation/bottom-tabs": "^6.5.18",
@@ -20,7 +21,13 @@
     "react-native-screens": "~3.29.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "@tsconfig/react-native": "^3.0.5",
+    "@types/jest": "^29.5.12",
+    "@types/react": "^18.2.79",
+    "@types/react-native": "^0.73.0",
+    "@types/react-test-renderer": "^18.0.7",
+    "typescript": "^5.4.5"
   },
   "private": true
 }
