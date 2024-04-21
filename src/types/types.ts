@@ -1,8 +1,10 @@
 // src/types/types.ts
 
 export interface Stock {
+    business_predictability: number;
     symbol: string;
     name: string;
+    fair_value: string;
   }
 
 

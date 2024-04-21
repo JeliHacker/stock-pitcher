@@ -1,6 +1,6 @@
 // PlateScreen.js
 import React, { useLayoutEffect } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
 import StockSwiper from '../components/StockSwiper'; 
 import { Ionicons } from '@expo/vector-icons'; 
 import { PlateScreenProps } from '../types/types'; 
@@ -9,6 +9,7 @@ import { PlateScreenProps } from '../types/types';
 const PlateScreen: React.FC<PlateScreenProps> = ({ navigation }) => {
   useLayoutEffect(() => {
     navigation.setOptions({
+      headerTitle: () => <Text>💸 Stock Pitcher</Text>,
       title: 'Stock Pitcher',
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
@@ -22,6 +23,7 @@ const PlateScreen: React.FC<PlateScreenProps> = ({ navigation }) => {
       ),
     });
   }, [navigation]);
+
   return (
     <View style={styles.container}>
       <StockSwiper />
