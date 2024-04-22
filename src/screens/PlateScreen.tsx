@@ -1,22 +1,24 @@
 // PlateScreen.js
-import React, { useLayoutEffect } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
+import React, { useLayoutEffect, useState } from 'react';
+import { View, StyleSheet, Text, TouchableOpacity, Image, TouchableWithoutFeedback } from 'react-native';
 import StockSwiper from '../components/StockSwiper'; 
 import { Ionicons } from '@expo/vector-icons'; 
 import { PlateScreenProps } from '../types/types'; 
-
+import SettingsModal from '../components/SettingsModal';
 
 const PlateScreen: React.FC<PlateScreenProps> = ({ navigation }) => {
+  const [settingsModalVisible, setSettingsModalVisible] = useState(false);
+  
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerTitle: () => <Text>💸 Stock Pitcher</Text>,
+      headerTitle: () => <Text style={{ fontSize: 16 }}>⚾️ Stock Pitcher</Text>,
       title: 'Stock Pitcher',
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity onPress={() => console.log('Filter tapped')}>
             <Ionicons name="filter" size={24} style={{ marginRight: 15 }} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => console.log('Settings tapped')}>
+          <TouchableOpacity onPress={() => setSettingsModalVisible(true)}>
             <Ionicons name="settings" size={24} style={{ marginRight: 15 }} />
           </TouchableOpacity>
         </View>
@@ -26,6 +28,11 @@ const PlateScreen: React.FC<PlateScreenProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <SettingsModal
+        visible={settingsModalVisible}
+        onClose={() => setSettingsModalVisible(false)}
+      />
+
       <StockSwiper />
     </View>
   );
@@ -34,7 +41,6 @@ const PlateScreen: React.FC<PlateScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 50, // Adjust padding as needed
   },
 });
 

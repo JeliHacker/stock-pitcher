@@ -97,7 +97,7 @@ const StockSwiper = () => {
           style={[styles.button]}
           onPress={handleSwingPress}
         >
-          <Text style={styles.swingButtonText}>✅</Text>
+          <Text style={styles.swingButtonText}>💸</Text>
         </TouchableOpacity>
       </View>
     </View>

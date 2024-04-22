@@ -3,15 +3,18 @@ import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; 
 import { useSavedStocks } from '../contexts/SavedStocksContext'; 
+import SettingsModal from '../components/SettingsModal';
 
 const SavedScreen = ({ navigation }) => {
+  const [settingsModalVisible, setSettingsModalVisible] = useState(false);
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerTitle: () => <Text>📋 Watchlist</Text>,
+      headerTitle: () => <Text style={{ fontSize: 16 }}>📋 Watchlist</Text>,
       title: 'Watchlist',
       headerRight: () => (
         <View style={{ flexDirection: 'row' }}>
-          <TouchableOpacity onPress={() => console.log('Settings tapped')}>
+          <TouchableOpacity onPress={() => setSettingsModalVisible(true)}>
             <Ionicons name="settings" size={24} style={{ marginRight: 15 }} />
           </TouchableOpacity>
         </View>
@@ -52,6 +55,10 @@ const SavedScreen = ({ navigation }) => {
   const renderItem = ({ item }) => {
     return (
       <View style={styles.row}>
+        <SettingsModal
+          visible={settingsModalVisible}
+          onClose={() => setSettingsModalVisible(false)}
+        />
         <View style={styles.leftContainer}>
           <Text style={styles.ticker}>{item.symbol}</Text>
           <Text style={styles.companyName}>{item.name}</Text>
@@ -77,7 +84,6 @@ const SavedScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 50,
   },
   row: {
     flexDirection: 'row',
