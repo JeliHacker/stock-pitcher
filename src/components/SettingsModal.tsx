@@ -1,6 +1,7 @@
 // SettingsModal.tsx
 import React, { useState, useEffect } from 'react';
-import { Modal, View, Animated, StyleSheet, TouchableWithoutFeedback, Text, ScrollView, Pressable } from 'react-native';
+import { Modal, View, Animated, StyleSheet, TouchableWithoutFeedback, Text, ScrollView, Pressable, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons'; 
 
 interface SettingsModalProps {
   visible: boolean;
@@ -40,9 +41,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }) => {
         <Animated.View style={[styles.modalOverlay, { opacity: backgroundOpacity }]}>
           <TouchableWithoutFeedback>
             <View style={styles.modalView}>
+                <View style={{ alignItems: 'center'}}>
+                    <Text style={styles.settingsTitle}>Settings</Text>
+                    <TouchableOpacity 
+                        style={styles.closeButton}
+                        onPress={onClose}>
+                        <Ionicons name="close-outline" size={48} color="#999" style={{ marginRight: 15 }} />
+                    </TouchableOpacity>
+                </View>
                 <ScrollView style={styles.scrollViewStyle}>
                     <Pressable>
-                        <Text style={styles.settingsTitle}>Settings</Text>
+                        
                         <Text style={styles.settingOption}>About</Text>    
                         <Text style={styles.settingOption}>In Warren Buffett's first TV interview, 
                         he describes his style of investing with a baseball analogy. The market pitches you balls (stocks) at different prices, and you can swing when you see a stock selling at an attractive price. However, unlike in baseball, there are no strikes, so you're never forced to swing. Stock Pitcher throws stock ideas at you, which you can save to a watchlist or let them go by.</Text>    
@@ -58,6 +67,11 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }) => {
 };
 
 const styles = StyleSheet.create({
+    closeButton: {
+        position: 'absolute',
+        right: -30, 
+        top: -20
+    },
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
