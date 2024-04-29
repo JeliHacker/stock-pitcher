@@ -4,8 +4,9 @@ import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native
 import { Ionicons } from '@expo/vector-icons'; 
 import { useSavedStocks } from '../contexts/SavedStocksContext'; 
 import SettingsModal from '../components/SettingsModal';
+import { SavedScreenProps, Stock } from '../types/types';
 
-const SavedScreen = ({ navigation }) => {
+const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
   const [settingsModalVisible, setSettingsModalVisible] = useState(false);
 
   useLayoutEffect(() => {
@@ -22,20 +23,23 @@ const SavedScreen = ({ navigation }) => {
     });
   }, [navigation]);
 
-  const { savedStocks } = useSavedStocks();
-  const [stockPrices, setStockPrices] = useState({});
-  const [loading, setLoading] = useState(false);
+  interface StockPrices {
+    [symbol: string]: string;
+  }
 
+  const { savedStocks } = useSavedStocks();
+  const [stockPrices, setStockPrices] = useState<StockPrices>({});
+  const [loading, setLoading] = useState(false);
+   
   useEffect(() => {
     const fetchPrices = async () => {
       setLoading(true);
-      let newStockPrices = {};
+      let newStockPrices: StockPrices = {};
       for (const stock of savedStocks) {
         const url = `http://api.codefit.lol/stocks/${stock.symbol}`;
         try {
           const response = await fetch(url);
           const data = await response.json();
-          const timeSeries = data['Time Series (5min)'];
           if (data && data.last_sale) {
             newStockPrices[stock.symbol] = parseFloat(data.last_sale).toFixed(2);
           }
@@ -52,7 +56,7 @@ const SavedScreen = ({ navigation }) => {
     }
   }, [savedStocks]); // Rerun effect when savedStocks changes
 
-  const renderItem = ({ item }) => {
+  const renderItem = ({ item }: { item: Stock }) => {
     return (
       <View style={styles.row}>
         <SettingsModal
@@ -61,7 +65,7 @@ const SavedScreen = ({ navigation }) => {
         />
         <View style={styles.leftContainer}>
           <Text style={styles.ticker}>{item.symbol}</Text>
-          <Text style={styles.companyName}>{item.name}</Text>
+          <Text style={styles.companyName} numberOfLines={1} ellipsizeMode='tail'>{item.name}</Text>
         </View>
         <View style={styles.rightContainer}>
           <Text style={styles.price}>${stockPrices[item.symbol] || '...'}</Text>
@@ -94,7 +98,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#303030', // Slightly lighter color for the line
   },
   leftContainer: {
-    // If you need to add styles for the left container
+    flex: 3,
   },
   ticker: {
     fontWeight: 'bold',
@@ -105,7 +109,7 @@ const styles = StyleSheet.create({
     color: '#a9a9a9', // Grey color for the text
   },
   rightContainer: {
-    // If you need to add styles for the right container
+    flex: 1,
     alignItems: 'flex-end', // Aligns price to the right
   },
   price: {

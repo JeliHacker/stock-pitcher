@@ -20,3 +20,9 @@ export type PlateScreenNavigationProp = BottomTabNavigationProp<RootTabParamList
 export interface PlateScreenProps {
   navigation: PlateScreenNavigationProp;
 }
+
+export type SavedScreenNavigationProp = BottomTabNavigationProp<RootTabParamList, 'Saved'>;
+
+export interface SavedScreenProps {
+  navigation: SavedScreenNavigationProp;
+}
