@@ -5,6 +5,7 @@ export interface Stock {
     symbol: string;
     name: string;
     fair_value: string;
+    price: string;
   }
 
 

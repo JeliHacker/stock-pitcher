@@ -39,17 +39,17 @@ const Card: React.FC<CardProps> = ({ card }) => {
       <ScrollView>
         <TouchableWithoutFeedback>
           <Text style={styles.text}>
-            {card.symbol}
+            <Text style={{fontSize: 64}}>{card.symbol}</Text>
             {'\n'}
             {card.name}
             {'\n'}
+            <Text>Price: ${card.price}</Text>
+            {'\n'}
             Fair value: ${card.fair_value}
-            {/* Fair value: {card.fair_value.replace(/\s+/g, '')} */}
             {'\n'}
             Business Predictability: {card.business_predictability}
             <Image source={require('../../assets/star_full.png')} style={styles.imageStyles}/>
-            {'\n'}
-            <Text>Page: {420}</Text>
+            
           </Text>
         </TouchableWithoutFeedback>
       </ScrollView>
@@ -58,6 +58,7 @@ const Card: React.FC<CardProps> = ({ card }) => {
 };
 
 const fetchStocks = async (
+  page: number,
   setCards: Dispatch<SetStateAction<Stock[]>>,
   setLoading: Dispatch<SetStateAction<boolean>>
 ) => {
@@ -73,7 +74,8 @@ const fetchStocks = async (
         symbol: stock.symbol,
         name: stock.name,
         fair_value: stock.fair_value,
-        business_predictability: stock.business_predictability
+        business_predictability: stock.business_predictability,
+        price: stock.last_sale
       })));
       setLoading(false);
     })
@@ -92,13 +94,25 @@ const StockSwiper = () => {
 
   const [cards, setCards] = useState<Stock[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);  // Initialize currentPage state
 
   const { saveStock } = useSavedStocks();
 
   useEffect(() => {
     setLoading(true); // Set loading before fetching
-    fetchStocks(setCards, setLoading);
+    getCurrentPage().then(page => {
+      setCurrentPage(page);
+      fetchStocks(page, setCards, setLoading);
+    });
   }, []);
+  
+  const handleSwipedAll = () => {
+    const nextPage = currentPage + 1;
+    incrementPageNumber().then(() => {
+      setCurrentPage(nextPage);  // Update currentPage state
+      fetchStocks(nextPage, setCards, setLoading);
+    });
+  };
 
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
@@ -127,20 +141,15 @@ const StockSwiper = () => {
           saveStock(cards[card]);
         }}
         onSwiped={(cardIndex) => {
-          console.log(`updating seen stocks, ${cardIndex}`);
           updateSeenStocks([cards[cardIndex].symbol]);
-
         }}
-        onSwipedAll={() => {
-          console.log("onSwipedAll()");
-          incrementPageNumber().then(() => fetchStocks(setCards, setLoading));
-          // Here you would typically also fetch the next page of stocks
-        }}
+        onSwipedAll={handleSwipedAll}
         cardIndex={0}
         verticalSwipe={false}
         cardVerticalMargin={0}
         backgroundColor={'#f0f0f0'}
         stackSize={3} // Number of cards visible in background
+        key={currentPage}
       />
       <View style={styles.buttonContainer}>
         <TouchableOpacity
