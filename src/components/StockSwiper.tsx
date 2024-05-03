@@ -1,57 +1,103 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, Dimensions, ScrollView, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useContext, useRef, SetStateAction, Dispatch } from 'react';
+import { View, Text, ActivityIndicator, StyleSheet, Dimensions, ScrollView, TouchableWithoutFeedback, TouchableOpacity, Image } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
 import { useSavedStocks } from '../contexts/SavedStocksContext';
 import { Stock } from '../types/types'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+// Function to update the seen stocks
+const updateSeenStocks = async (newStock: any) => {
+  const seenStocks = await AsyncStorage.getItem('seenStocks');
+  const updatedStocks = seenStocks ? JSON.parse(seenStocks).concat(newStock) : newStock;
+  await AsyncStorage.setItem('seenStocks', JSON.stringify(updatedStocks));
+};
+
+const getCurrentPage = async () => {
+  const pageNumber = await AsyncStorage.getItem('pageNumber');
+  return pageNumber ? parseInt(pageNumber, 10) : 1; // Default to page 1 if not set
+};
+
+// Function to increment the page number
+const incrementPageNumber = async () => {
+  const currentPage = await getCurrentPage();
+  const nextPage = currentPage + 1;
+  await AsyncStorage.setItem('pageNumber', nextPage.toString());
+  console.log("currentPage is now", currentPage);
+};
+
 
 
 interface CardProps {
   card: Stock;
 }
 
-const Card: React.FC<CardProps> = ({ card }) => (
-  <View style={styles.card}>
-    <ScrollView>
-      <TouchableWithoutFeedback>
-        <Text style={styles.text}>
-          {card.symbol}
-          {'\n'}
-          {card.name}
-          {'\n'}
-          Fair value: {card.fair_value.replace(/\s+/g, '')}
-          {'\n'}
-          Business Predictability: {card.business_predictability}
-        </Text>
-      </TouchableWithoutFeedback>
-    </ScrollView>
-  </View>
-);
+const Card: React.FC<CardProps> = ({ card }) => {
+
+  return ( 
+    <View style={styles.card}>
+      <ScrollView>
+        <TouchableWithoutFeedback>
+          <Text style={styles.text}>
+            {card.symbol}
+            {'\n'}
+            {card.name}
+            {'\n'}
+            Fair value: ${card.fair_value}
+            {/* Fair value: {card.fair_value.replace(/\s+/g, '')} */}
+            {'\n'}
+            Business Predictability: {card.business_predictability}
+            <Image source={require('../../assets/star_full.png')} style={styles.imageStyles}/>
+            {'\n'}
+            <Text>Page: {420}</Text>
+          </Text>
+        </TouchableWithoutFeedback>
+      </ScrollView>
+    </View>
+  );
+};
+
+const fetchStocks = async (
+  setCards: Dispatch<SetStateAction<Stock[]>>,
+  setLoading: Dispatch<SetStateAction<boolean>>
+) => {
+  const currentPage = await getCurrentPage();
+  const seenStocks = JSON.parse(await AsyncStorage.getItem('seenStocks') || '[]');
+  console.log("fetching stocks for page", currentPage);
+  fetch(`http://api.codefit.lol/stocks?page=${currentPage}`)
+    .then(response => response.json())
+    .then(data => {
+      const newStocks = data.filter((stock: any) => !seenStocks.includes(stock.symbol));
+      console.log("newStocks length = ", newStocks.length);
+      setCards(newStocks.map((stock: any) => ({
+        symbol: stock.symbol,
+        name: stock.name,
+        fair_value: stock.fair_value,
+        business_predictability: stock.business_predictability
+      })));
+      setLoading(false);
+    })
+    .catch(error => {
+      console.error('Error fetching stock data:', error);
+      setLoading(false);
+    });
+
+    console.log("done fetching stocks");
+}
+
 
 const StockSwiper = () => {
   // Create a ref to store the Swiper instance
   const swiperRef = useRef<any>(null);
 
-  const [cards, setCards] = useState([]);
+  const [cards, setCards] = useState<Stock[]>([]);
   const [loading, setLoading] = useState(true);
 
   const { saveStock } = useSavedStocks();
 
   useEffect(() => {
-    fetch('http://api.codefit.lol/stocks')
-      .then(response => response.json())
-      .then(data => {
-        setCards(data.map((stock:any) => ({
-          symbol: stock.symbol,
-          name: stock.name,
-          fair_value: stock.fair_value,
-          business_predictability: stock.business_predictability
-        })));
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('Error fetching stock data:', error);
-        setLoading(false);
-      });
+    setLoading(true); // Set loading before fetching
+    fetchStocks(setCards, setLoading);
   }, []);
 
   if (loading) {
@@ -79,6 +125,16 @@ const StockSwiper = () => {
         renderCard={(card) => <Card card={card} />}
         onSwipedRight={(card) => {
           saveStock(cards[card]);
+        }}
+        onSwiped={(cardIndex) => {
+          console.log(`updating seen stocks, ${cardIndex}`);
+          updateSeenStocks([cards[cardIndex].symbol]);
+
+        }}
+        onSwipedAll={() => {
+          console.log("onSwipedAll()");
+          incrementPageNumber().then(() => fetchStocks(setCards, setLoading));
+          // Here you would typically also fetch the next page of stocks
         }}
         cardIndex={0}
         verticalSwipe={false}
@@ -133,14 +189,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around', // Space out buttons as desired
     width: '100%', // Full width to allow space-around to work
   },
-  passButtonText: {
-    color: 'black',
-    fontSize: 16, // Adjust the size as needed
-  },
-  swingButtonText: {
-    color: 'white',
-    fontSize: 16, // Adjust the size as needed
-  },
   card: {
     height: cardHeight,
     borderRadius: 8,
@@ -149,6 +197,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'white',
   },
+  imageStyles: {
+    width: 30,
+    height: 30,
+    resizeMode: 'contain'
+  },
+  passButtonText: {
+    color: 'black',
+    fontSize: 32, // Adjust the size as needed
+  },
+  swingButtonText: {
+    color: 'white',
+    fontSize: 32, // Adjust the size as needed
+  },
+  
   passButton: {
     backgroundColor: 'red',
     color: '#000'
