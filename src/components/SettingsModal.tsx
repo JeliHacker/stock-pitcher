@@ -1,12 +1,40 @@
 // SettingsModal.tsx
-import React, { useState, useEffect } from 'react';
-import { Modal, View, Animated, StyleSheet, TouchableWithoutFeedback, Text, ScrollView, Pressable, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, ReactNode } from 'react';
+import { Modal, View, Animated, LayoutAnimation, StyleSheet, TouchableWithoutFeedback, Text, ScrollView, Pressable, TouchableOpacity, Platform, UIManager } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; 
 
 interface SettingsModalProps {
   visible: boolean;
   onClose: () => void;
 }
+
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
+interface AccordionItemProps {
+  title: string;
+  children: ReactNode;
+}
+
+const AccordionItem: React.FC<AccordionItemProps> = ({ title, children }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleAccordion = () => {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setIsOpen(!isOpen);
+  };
+
+  return (
+      <View>
+          <Pressable onPress={toggleAccordion} style={styles.pressable}>
+              <Text style={styles.title}>{title}</Text>
+              <Ionicons name={isOpen ? 'chevron-up' : 'chevron-down'} size={20} color="#000" />
+          </Pressable>
+          {isOpen && <View style={styles.content}>{children}</View>}
+      </View>
+  );
+};
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }) => {
     // Create an animated value for the background opacity
@@ -50,13 +78,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }) => {
                     </TouchableOpacity>
                 </View>
                 <ScrollView style={styles.scrollViewStyle}>
-                    <Pressable>
-                        
-                        <Text style={styles.settingOption}>About</Text>    
-                        <Text style={styles.settingOption}>In Warren Buffett's first TV interview, 
-                        he describes his style of investing with a baseball analogy. The market pitches you balls (stocks) at different prices, and you can swing when you see a stock selling at an attractive price. However, unlike in baseball, there are no strikes, so you're never forced to swing. Stock Pitcher throws stock ideas at you, which you can save to a watchlist or let them go by.</Text>    
-                        <Text>The purpose of Stock Pitcher is to give users a way to explore stocks in a fun way.</Text>
-                    </Pressable>
+                    <AccordionItem title="About">
+                      <Text style={styles.settingOption}>
+                          In Warren Buffett's first TV interview, he describes his style of investing with a baseball analogy. The market pitches you balls (stocks) at different prices, and you can swing when you see a stock selling at an attractive price. However, unlike in baseball, there are no strikes, so you're never forced to swing. Stock Pitcher throws stock ideas at you, which you can save to a watchlist or let them go by.
+                      </Text>
+                      <Text style={styles.settingOption}>
+                          The purpose of Stock Pitcher is to give users a way to explore stocks in a fun way.
+                      </Text>
+                  </AccordionItem>
                 </ScrollView>
             </View>
           </TouchableWithoutFeedback>
@@ -111,7 +140,23 @@ const styles = StyleSheet.create({
   },
   settingsTitle: {
     fontSize: 36
-  }
+  },
+  pressable: {
+    backgroundColor: '#f0f0f0',
+    padding: 10,
+    marginVertical: 5,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  title: {
+      fontSize: 18,
+      fontWeight: 'bold',
+  },
+  content: {
+      padding: 10,
+      backgroundColor: '#fff',
+  },
 });
 
 export default SettingsModal;
