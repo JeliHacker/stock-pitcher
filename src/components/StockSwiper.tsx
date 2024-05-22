@@ -5,6 +5,7 @@ import { useSavedStocks } from '../contexts/SavedStocksContext';
 import { Stock } from '../types/types'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const { width } = Dimensions.get('window');
 
 // Function to update the seen stocks
 const updateSeenStocks = async (newStock: any) => {
@@ -26,33 +27,52 @@ const incrementPageNumber = async () => {
   console.log("currentPage is now", currentPage);
 };
 
+  interface CardProps {
+    card: Stock;
+  }
 
-
-interface CardProps {
-  card: Stock;
-}
-
+// definition for a card
 const Card: React.FC<CardProps> = ({ card }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const attributes = [
+    `Business Predictability: ${card.business_predictability}`,
+    `Symbol: ${card.symbol}`,
+    `Name: ${card.name}`,
+    `Fair Value: ${card.fair_value}`,
+    `Price: ${card.price}`
+  ];
+
+  const handleLeftTap = () => {
+    setCurrentIndex((prevIndex) => (prevIndex == 0 ? 0 : prevIndex - 1));
+  };
+
+  const handleRightTap = () => {
+    if (currentIndex == 4) { // can't really understand why this works, but it does. Prevents a bug.
+      return;
+    } else {
+      setCurrentIndex((prevIndex) => (prevIndex >= 5 ? 5 : prevIndex + 1));
+    }
+  };
 
   return ( 
     <View style={styles.card}>
-      <ScrollView>
-        <TouchableWithoutFeedback>
-          <Text style={styles.text}>
-            <Text style={{fontSize: 64}}>{card.symbol}</Text>
-            {'\n'}
-            {card.name}
-            {'\n'}
-            <Text>Price: ${card.price}</Text>
-            {'\n'}
-            Fair value: ${card.fair_value}
-            {'\n'}
-            Business Predictability: {card.business_predictability}
-            <Image source={require('../../assets/star_full.png')} style={styles.imageStyles}/>
-            
-          </Text>
-        </TouchableWithoutFeedback>
-      </ScrollView>
+      <View style={styles.tabsContainer}>
+      {attributes.map((_, index) => (
+          <View
+            key={index}
+            style={[
+              styles.tab,
+              currentIndex == index && styles.activeTab,
+            ]}
+          />
+        ))}
+      </View>
+      <TouchableOpacity style={styles.leftSide} onPress={handleLeftTap} />
+      <View style={styles.center}>
+        <Text style={styles.text}>{attributes[currentIndex]}</Text>
+      </View>
+      <TouchableOpacity style={styles.rightSide} onPress={handleRightTap} />
     </View>
   );
 };
@@ -133,6 +153,7 @@ const StockSwiper = () => {
 
   return (
     <View style={styles.container}>
+      <Text>current page: {currentPage}</Text>
       <Swiper
         ref={swiperRef}
         cards={cards}
@@ -151,6 +172,7 @@ const StockSwiper = () => {
         stackSize={3} // Number of cards visible in background
         key={currentPage}
       />
+      <Text>current page: {currentPage}</Text>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button]}
@@ -231,6 +253,54 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 32,
     backgroundColor: 'transparent',
+  },
+  tabsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    padding: 10,
+  },
+  tab: {
+    width: 40,
+    height: 2,
+    backgroundColor: 'black',
+    margin: 5,
+    // borderRadius: 10,
+    borderColor: 'black'
+  },
+  activeTab: {
+    backgroundColor: 'white',
+    borderColor: 'black',
+    borderWidth: 2
+  },
+  leftSide: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: width / 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1
+  },
+  rightSide: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: width / 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1
+  },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 0,
+  },
+  arrow: {
+    fontSize: 36,
+    color: '#ccc',
   },
 });
 
