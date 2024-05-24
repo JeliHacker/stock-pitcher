@@ -25,7 +25,6 @@ const AppNavigator = () => {
                 iconName = focused ? 'bookmark' : 'bookmark-o'; // Example: solid star when focused, outline star otherwise
               }
         
-              // You can return any component that you like here!
               return <FontAwesome name={iconName} size={size} color={color} />;
             },
           })}

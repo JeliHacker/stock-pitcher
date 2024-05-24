@@ -4,6 +4,14 @@ import Swiper from 'react-native-deck-swiper';
 import { useSavedStocks } from '../contexts/SavedStocksContext';
 import { Stock } from '../types/types'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import WebViewModal from './WebViewModal'
+
+type RootStackParamList = {
+  Home: undefined;
+  WebView: { url: string };
+};
 
 const { width } = Dimensions.get('window');
 
@@ -35,6 +43,26 @@ const incrementPageNumber = async () => {
 const Card: React.FC<CardProps> = ({ card }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [currentUrl, setCurrentUrl] = useState('');
+  const [currentTitle, setCurrentTitle] = useState('');
+
+  const handlePress = (url: string, title: string) => {
+    setCurrentUrl(url);
+    setCurrentTitle(title);
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+  };
+
+  const urls = {
+    guruFocus: `https://www.gurufocus.com/stock/${card.symbol}`,
+    seekingAlpha: `https://seekingalpha.com/symbol/${card.symbol}`,
+    yahooFinance: `https://finance.yahoo.com/quote/${card.symbol}`,
+  };
+
   const attributes = [
     (
       <View style={styles.attributeContainer}>
@@ -61,7 +89,9 @@ const Card: React.FC<CardProps> = ({ card }) => {
     (
       <View style={styles.attributeContainer}>
         <Text style={styles.text}>Insider Buying</Text>
-        <Image source={require('../../assets/GuruFocus_logo.png')} style={styles.image} resizeMode='contain' />
+        <TouchableOpacity onPress={() => handlePress(urls.guruFocus, 'GuruFocus')}>
+          <Image source={require('../../assets/GuruFocus_logo.png')} style={styles.image} resizeMode='contain' />
+        </TouchableOpacity>
       </View>
     ),
   ];
@@ -80,6 +110,7 @@ const Card: React.FC<CardProps> = ({ card }) => {
 
   return ( 
     <View style={styles.card}>
+      {/* Tabs */}
       <View style={styles.tabsContainer}>
       {attributes.map((_, index) => (
           <View
@@ -91,11 +122,17 @@ const Card: React.FC<CardProps> = ({ card }) => {
           />
         ))}
       </View>
+
       <TouchableOpacity style={styles.leftSide} onPress={handleLeftTap} />
+      <TouchableOpacity style={styles.rightSide} onPress={handleRightTap} />
+      <TouchableOpacity style={styles.image} onPress={() => handlePress(urls.guruFocus, 'GuruFocus')}>
+        <Image source={require('../../assets/GuruFocus_logo.png')} style={styles.image} resizeMode='contain' />
+      </TouchableOpacity>
       <View style={styles.center}>
         <Text style={styles.text}>{attributes[currentIndex]}</Text>
       </View>
-      <TouchableOpacity style={styles.rightSide} onPress={handleRightTap} />
+      
+      <WebViewModal visible={modalVisible} onClose={handleCloseModal} url={currentUrl} title={currentTitle} />
     </View>
   );
 };
@@ -221,9 +258,24 @@ const screenHeight = Dimensions.get('window').height;
 const cardHeight = screenHeight * 0.75; // for 75% of the screen height
 
 const styles = StyleSheet.create({
-  container: {
+  activeTab: {
+    backgroundColor: 'white',
+    borderColor: 'black',
+    borderWidth: 2,
+    padding: 1,
+  },
+  arrow: {
+    fontSize: 36,
+    color: '#ccc',
+  },
+  attributeContainer: {
+    alignItems: 'center',
+  },
+  center: {
     flex: 1,
-    backgroundColor: '#235643'
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 0
   },
   button: {
     width: 60, // Diameter of the circle
@@ -251,10 +303,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'white',
   },
+  container: {
+    flex: 1,
+    backgroundColor: '#235643'
+  },
   imageStyles: {
     width: 30,
     height: 30,
     resizeMode: 'contain'
+  },
+  passButton: {
+    backgroundColor: 'red',
+    color: '#000'
   },
   passButtonText: {
     color: 'black',
@@ -264,18 +324,8 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 32, // Adjust the size as needed
   },
-  
-  passButton: {
-    backgroundColor: 'red',
-    color: '#000'
-  },
   swingButton: {
     backgroundColor: 'green',
-  },
-  text: {
-    textAlign: 'center',
-    fontSize: 32,
-    backgroundColor: 'transparent',
   },
   tabsContainer: {
     flexDirection: 'row',
@@ -292,11 +342,10 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     padding: 1,
   },
-  activeTab: {
-    backgroundColor: 'white',
-    borderColor: 'black',
-    borderWidth: 2,
-    padding: 1,
+  text: {
+    textAlign: 'center',
+    fontSize: 32,
+    backgroundColor: 'transparent',
   },
   leftSide: {
     position: 'absolute',
@@ -306,7 +355,7 @@ const styles = StyleSheet.create({
     width: width / 2,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1
+    zIndex: 1,
   },
   rightSide: {
     position: 'absolute',
@@ -316,24 +365,12 @@ const styles = StyleSheet.create({
     width: width / 2,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1
-  },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 0,
-  },
-  arrow: {
-    fontSize: 36,
-    color: '#ccc',
-  },
-  attributeContainer: {
-    alignItems: 'center',
+    zIndex: 1,
   },
   image: {
     width: 100,
-    height: 100
+    height: 100,
+    zIndex: 100
   },
 });
 
