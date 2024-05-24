@@ -36,11 +36,34 @@ const Card: React.FC<CardProps> = ({ card }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const attributes = [
-    `Business Predictability: ${card.business_predictability}`,
-    `Symbol: ${card.symbol}`,
-    `Name: ${card.name}`,
-    `Fair Value: ${card.fair_value}`,
-    `Price: ${card.price}`
+    (
+      <View style={styles.attributeContainer}>
+        <Text style={styles.text}>Name: {card.name}</Text>
+        <Text style={styles.text}>Fair Value: {card.fair_value}</Text>
+      </View>
+    ),
+    (
+      <View style={styles.attributeContainer}>
+        <Text style={styles.text}>Business Predictability: {card.business_predictability}</Text>
+      </View>
+    ),
+    (
+      <View style={styles.attributeContainer}>
+        <Text style={styles.text}>Symbol: {card.symbol}</Text>
+        <Text style={styles.text}>Price: {card.price}</Text>
+      </View>
+    ),
+    (
+      <View style={styles.attributeContainer}>
+        <Text style={styles.text}>Fair Value: {card.fair_value}</Text>
+      </View>
+    ),
+    (
+      <View style={styles.attributeContainer}>
+        <Text style={styles.text}>Insider Buying</Text>
+        <Image source={require('../../assets/GuruFocus_logo.png')} style={styles.image} resizeMode='contain' />
+      </View>
+    ),
   ];
 
   const handleLeftTap = () => {
@@ -260,17 +283,20 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   tab: {
-    width: 40,
+    width: 55,
     height: 2,
     backgroundColor: 'black',
-    margin: 5,
-    // borderRadius: 10,
-    borderColor: 'black'
+    marginHorizontal: 5,
+    borderRadius: 10,
+    borderColor: 'black',
+    borderWidth: 2,
+    padding: 1,
   },
   activeTab: {
     backgroundColor: 'white',
     borderColor: 'black',
-    borderWidth: 2
+    borderWidth: 2,
+    padding: 1,
   },
   leftSide: {
     position: 'absolute',
@@ -301,6 +327,13 @@ const styles = StyleSheet.create({
   arrow: {
     fontSize: 36,
     color: '#ccc',
+  },
+  attributeContainer: {
+    alignItems: 'center',
+  },
+  image: {
+    width: 100,
+    height: 100
   },
 });
 
