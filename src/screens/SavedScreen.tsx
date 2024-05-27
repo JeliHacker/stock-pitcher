@@ -59,10 +59,6 @@ const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
   const renderItem = ({ item }: { item: Stock }) => {
     return (
       <View style={styles.row}>
-        <SettingsModal
-          visible={settingsModalVisible}
-          onClose={() => setSettingsModalVisible(false)}
-        />
         <View style={styles.leftContainer}>
           <Text style={styles.ticker}>{item.symbol}</Text>
           <Text style={styles.companyName} numberOfLines={1} ellipsizeMode='tail'>{item.name}</Text>
@@ -81,6 +77,10 @@ const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
         keyExtractor={(item, index) => item.symbol + index}
         renderItem={renderItem}
       />
+      <SettingsModal
+          visible={settingsModalVisible}
+          onClose={() => setSettingsModalVisible(false)}
+        />
     </View>
   );
 };
