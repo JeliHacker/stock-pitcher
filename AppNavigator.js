@@ -13,7 +13,7 @@ const AppNavigator = () => {
     <NavigationContainer>
       <Tab.Navigator
         screenOptions={({ route }) => ({
-            tabBarActiveTintColor: 'lawngreen',
+            tabBarActiveTintColor: 'limegreen',
             tabBarInactiveTintColor: 'gray',
             tabBarIcon: ({ focused, color, size }) => {
               let iconName;
