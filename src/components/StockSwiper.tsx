@@ -5,8 +5,9 @@ import { useSavedStocks } from '../contexts/SavedStocksContext';
 import { Stock } from '../types/types'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import WebViewModal from './WebViewModal'
+import WebViewModal from './WebViewModal';
+import YahooFinanceLogo from '../../assets/YahooFinance_logo.svg';
+import Drupal from '../../assets/drupal.svg';
 
 type RootStackParamList = {
   Home: undefined;
@@ -58,7 +59,7 @@ const Card: React.FC<CardProps> = ({ card }) => {
   };
 
   const urls = {
-    guruFocus: `https://www.gurufocus.com/stock/${card.symbol}`,
+    guruFocus: `https://www.gurufocus.com/stock/${card.symbol}/insider`,
     seekingAlpha: `https://seekingalpha.com/symbol/${card.symbol}`,
     yahooFinance: `https://finance.yahoo.com/quote/${card.symbol}`,
   };
@@ -90,7 +91,7 @@ const Card: React.FC<CardProps> = ({ card }) => {
       <View style={styles.attributeContainer}>
         <Text style={styles.text}>Insider Buying</Text>
         <TouchableOpacity onPress={() => handlePress(urls.guruFocus, 'GuruFocus')}>
-          <Image source={require('../../assets/GuruFocus_logo.png')} style={styles.image} resizeMode='contain' />
+          <Image source={require('../../assets/GuruFocus_logo.png')} style={styles.gurufocus_logo} resizeMode='contain' />
         </TouchableOpacity>
       </View>
     ),
@@ -125,9 +126,17 @@ const Card: React.FC<CardProps> = ({ card }) => {
 
       <TouchableOpacity style={styles.leftSide} onPress={handleLeftTap} />
       <TouchableOpacity style={styles.rightSide} onPress={handleRightTap} />
-      <TouchableOpacity style={styles.image} onPress={() => handlePress(urls.guruFocus, 'GuruFocus')}>
-        <Image source={require('../../assets/GuruFocus_logo.png')} style={styles.image} resizeMode='contain' />
-      </TouchableOpacity>
+      { currentIndex == 0 &&
+        <TouchableOpacity style={styles.gurufocus_logo} onPress={() => handlePress(urls.seekingAlpha, 'Yahoo Finance')}>
+          <YahooFinanceLogo width="120" height="40" />
+        </TouchableOpacity>
+      }
+      { currentIndex == 4 &&
+        <TouchableOpacity style={styles.gurufocus_logo} onPress={() => handlePress(urls.guruFocus, 'GuruFocus')}>
+          <Image source={require('../../assets/GuruFocus_logo.png')} style={styles.gurufocus_logo} resizeMode='contain' />
+        </TouchableOpacity>
+      }
+      
       <View style={styles.center}>
         <Text style={styles.text}>{attributes[currentIndex]}</Text>
       </View>
@@ -144,12 +153,11 @@ const fetchStocks = async (
 ) => {
   const currentPage = await getCurrentPage();
   const seenStocks = JSON.parse(await AsyncStorage.getItem('seenStocks') || '[]');
-  console.log("fetching stocks for page", currentPage);
+
   fetch(`http://api.codefit.lol/stocks?page=${currentPage}`)
     .then(response => response.json())
     .then(data => {
       const newStocks = data.filter((stock: any) => !seenStocks.includes(stock.symbol));
-      console.log("newStocks length = ", newStocks.length);
       setCards(newStocks.map((stock: any) => ({
         symbol: stock.symbol,
         name: stock.name,
@@ -163,8 +171,6 @@ const fetchStocks = async (
       console.error('Error fetching stock data:', error);
       setLoading(false);
     });
-
-    console.log("done fetching stocks");
 }
 
 
@@ -213,7 +219,6 @@ const StockSwiper = () => {
 
   return (
     <View style={styles.container}>
-      <Text>current page: {currentPage}</Text>
       <Swiper
         ref={swiperRef}
         cards={cards}
@@ -232,7 +237,10 @@ const StockSwiper = () => {
         stackSize={3} // Number of cards visible in background
         key={currentPage}
       />
-      <Text>current page: {currentPage}</Text>
+
+      {/* this is for logging purposes, because I'm a hack */}
+      {/* <Text>current page: {currentPage}</Text> */} 
+      
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button]}
@@ -367,7 +375,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 1,
   },
-  image: {
+  gurufocus_logo: {
+    position: 'absolute',
     width: 100,
     height: 100,
     zIndex: 100
