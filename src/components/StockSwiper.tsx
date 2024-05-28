@@ -4,15 +4,9 @@ import Swiper from 'react-native-deck-swiper';
 import { useSavedStocks } from '../contexts/SavedStocksContext';
 import { Stock } from '../types/types'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
 import WebViewModal from './WebViewModal';
 import YahooFinanceLogo from '../../assets/YahooFinance_logo.svg';
-import Drupal from '../../assets/drupal.svg';
-
-type RootStackParamList = {
-  Home: undefined;
-  WebView: { url: string };
-};
+import WebViewEmbedded from './WebViewEmbedded';
 
 const { width } = Dimensions.get('window');
 
@@ -59,21 +53,26 @@ const Card: React.FC<CardProps> = ({ card }) => {
   };
 
   const urls = {
-    guruFocus: `https://www.gurufocus.com/stock/${card.symbol}/insider`,
+    guruFocusInsider: `https://www.gurufocus.com/stock/${card.symbol}/insider`,
+    guruFocusDCF: `https://www.gurufocus.com/stock/${card.symbol}/dcf`,
     seekingAlpha: `https://seekingalpha.com/symbol/${card.symbol}`,
+    seekingAlphaFilings: `https://seekingalpha.com/symbol/${card.symbol}/sec-filings`,
+    edgar: `https://www.sec.gov/edgar/browse/?CIK=1514991&owner=exclude`,
     yahooFinance: `https://finance.yahoo.com/quote/${card.symbol}`,
   };
 
   const attributes = [
     (
       <View style={styles.attributeContainer}>
+        <Text style={styles.text}>{card.symbol}</Text>
         <Text style={styles.text}>Name: {card.name}</Text>
-        <Text style={styles.text}>Fair Value: {card.fair_value}</Text>
       </View>
     ),
     (
       <View style={styles.attributeContainer}>
+        <Text>Valuation</Text>
         <Text style={styles.text}>Business Predictability: {card.business_predictability}</Text>
+        <Text style={styles.text}>Fair Value: {card.fair_value}</Text>
       </View>
     ),
     (
@@ -84,15 +83,12 @@ const Card: React.FC<CardProps> = ({ card }) => {
     ),
     (
       <View style={styles.attributeContainer}>
-        <Text style={styles.text}>Fair Value: {card.fair_value}</Text>
+        <Text style={styles.text}>Financial Reports</Text>
       </View>
     ),
     (
       <View style={styles.attributeContainer}>
         <Text style={styles.text}>Insider Buying</Text>
-        <TouchableOpacity onPress={() => handlePress(urls.guruFocus, 'GuruFocus')}>
-          <Image source={require('../../assets/GuruFocus_logo.png')} style={styles.gurufocus_logo} resizeMode='contain' />
-        </TouchableOpacity>
       </View>
     ),
   ];
@@ -126,20 +122,42 @@ const Card: React.FC<CardProps> = ({ card }) => {
 
       <TouchableOpacity style={styles.leftSide} onPress={handleLeftTap} />
       <TouchableOpacity style={styles.rightSide} onPress={handleRightTap} />
-      { currentIndex == 0 &&
-        <TouchableOpacity style={styles.gurufocus_logo} onPress={() => handlePress(urls.seekingAlpha, 'Yahoo Finance')}>
-          <YahooFinanceLogo width="120" height="40" />
-        </TouchableOpacity>
-      }
-      { currentIndex == 4 &&
-        <TouchableOpacity style={styles.gurufocus_logo} onPress={() => handlePress(urls.guruFocus, 'GuruFocus')}>
-          <Image source={require('../../assets/GuruFocus_logo.png')} style={styles.gurufocus_logo} resizeMode='contain' />
-        </TouchableOpacity>
-      }
       
       <View style={styles.center}>
         <Text style={styles.text}>{attributes[currentIndex]}</Text>
       </View>
+      
+      {/* All of this is because the links aren't pressable because they are hidden under the left and right touchable opacities */}
+      { currentIndex == 0 &&
+        <TouchableOpacity style={styles.yahoofinance_logo} onPress={() => handlePress(urls.yahooFinance, 'Yahoo Finance')}>
+          <Text>View in</Text>
+          <YahooFinanceLogo width="120" height="40" />
+        </TouchableOpacity>
+      }
+      { currentIndex == 1 &&
+        <TouchableOpacity style={styles.gurufocus_logo} onPress={() => handlePress(urls.guruFocusDCF, 'GuruFocus')}>
+          <Text>View in</Text>
+          <Image source={require('../../assets/GuruFocus_logo.png')} width={60} height={30} resizeMode='center' />
+        </TouchableOpacity>
+      }
+      { currentIndex == 2 &&
+        <TouchableOpacity style={styles.gurufocus_logo} onPress={() => handlePress(urls.seekingAlpha, 'Seeking Alpha')}>
+          <Text>View in</Text>
+          <Image source={require('../../assets/SeekingAlpha_logo.png')} width={60} height={30} resizeMode='center' />
+        </TouchableOpacity>
+      }
+      { currentIndex == 3 &&
+        <TouchableOpacity style={styles.gurufocus_logo} onPress={() => handlePress(urls.edgar, 'Seeking Alpha')}>
+          <Text>View in</Text>
+          <Image source={require('../../assets/SeekingAlpha_logo.png')} width={60} height={30} resizeMode='center' />
+        </TouchableOpacity>
+      }
+      { currentIndex == 4 &&
+        <TouchableOpacity style={styles.gurufocus_logo} onPress={() => handlePress(urls.guruFocusInsider, 'GuruFocus')}>
+          <Text>View in</Text>
+          <Image source={require('../../assets/GuruFocus_logo.png')} style={styles.gurufocus_logo} resizeMode='contain' />
+        </TouchableOpacity>
+      }
       
       <WebViewModal visible={modalVisible} onClose={handleCloseModal} url={currentUrl} title={currentTitle} />
     </View>
@@ -222,8 +240,8 @@ const StockSwiper = () => {
       <Swiper
         ref={swiperRef}
         cards={cards}
-        renderCard={(card) => <Card card={card} />}
-        onSwipedRight={(card) => {
+        renderCard={(card) => <Card card={card} /> }
+            onSwipedRight={(card) => {
           saveStock(cards[card]);
         }}
         onSwiped={(cardIndex) => {
@@ -267,8 +285,8 @@ const cardHeight = screenHeight * 0.75; // for 75% of the screen height
 
 const styles = StyleSheet.create({
   activeTab: {
-    backgroundColor: 'white',
-    borderColor: 'black',
+    backgroundColor: 'limegreen',
+    borderColor: 'limegreen',
     borderWidth: 2,
     padding: 1,
   },
@@ -281,9 +299,8 @@ const styles = StyleSheet.create({
   },
   center: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 0
+    zIndex: 0,
   },
   button: {
     width: 60, // Diameter of the circle
@@ -309,6 +326,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#E8E8E8',
     justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: 'white',
   },
   container: {
@@ -352,7 +370,7 @@ const styles = StyleSheet.create({
   },
   text: {
     textAlign: 'center',
-    fontSize: 32,
+    fontSize: 24,
     backgroundColor: 'transparent',
   },
   leftSide: {
@@ -377,10 +395,27 @@ const styles = StyleSheet.create({
   },
   gurufocus_logo: {
     position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
     width: 100,
     height: 100,
-    zIndex: 100
+    zIndex: 100,
+    bottom: '15%'
   },
+  gurufocus_logo_image: {
+    width: 100,
+    height: 100,
+  },
+  yahoofinance_logo: {
+    position: 'absolute',
+    backgroundColor: 'pink',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 230,
+    height: 100,
+    zIndex: 100,
+    bottom: '15%'
+  }
 });
 
 export default StockSwiper;
