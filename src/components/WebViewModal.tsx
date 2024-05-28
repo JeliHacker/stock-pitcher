@@ -14,32 +14,49 @@ const WebViewModal: React.FC<WebViewModalProps> = ({ visible, onClose, url, titl
     <Modal
       visible={visible}
       transparent={true}
-      animationType="slide"
+      animationType="fade"
     >
-      <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-          <View style={styles.header}>
-            <Text style={styles.title}>{title}</Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
-          </View>
-          <WebView source={{ uri: url }} style={styles.webView} />
+    <TouchableOpacity
+        style={styles.modalOverlay}
+        activeOpacity={1}
+        onPressOut={onClose}
+      >
+      <View style={styles.modalContentContainer}>
+          <TouchableOpacity activeOpacity={1} style={styles.modalContent}>
+            <View style={styles.header}>
+              <Text style={styles.title}>{title}</Text>
+              <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+            <WebView 
+              originWhitelist={['*']} // https://github.com/react-native-webview/react-native-webview/issues/2567
+              source={{ uri: url }}
+              style={styles.webView} 
+              javaScriptEnabled={true}
+              domStorageEnabled={true}
+            />
+          </TouchableOpacity>
         </View>
-      </View>
+    </TouchableOpacity>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  modalContainer: {
+  modalOverlay: {
     flex: 1,
     justifyContent: 'center',
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
-  modalContent: {
+  modalContentContainer: {
     flex: 1,
-    margin: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    height: '80%',
+    width: '90%',
     backgroundColor: 'white',
     borderRadius: 10,
     overflow: 'hidden',
@@ -64,6 +81,7 @@ const styles = StyleSheet.create({
   },
   webView: {
     flex: 1,
+    width: '100%'
   },
 });
 
