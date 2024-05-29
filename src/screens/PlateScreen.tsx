@@ -5,6 +5,7 @@ import StockSwiper from '../components/StockSwiper';
 import { Ionicons } from '@expo/vector-icons'; 
 import { PlateScreenProps } from '../types/types'; 
 import SettingsModal from '../components/SettingsModal';
+import { ModalProvider, useModal } from '../contexts/ModalContext';
 
 const PlateScreen: React.FC<PlateScreenProps> = ({ navigation }) => {
   const [settingsModalVisible, setSettingsModalVisible] = useState(false);
@@ -33,7 +34,9 @@ const PlateScreen: React.FC<PlateScreenProps> = ({ navigation }) => {
         onClose={() => setSettingsModalVisible(false)}
       />
 
-      <StockSwiper />
+      <ModalProvider>
+        <StockSwiper />
+      </ModalProvider>
     </View>
   );
 };

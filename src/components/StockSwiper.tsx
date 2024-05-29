@@ -7,6 +7,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import WebViewModal from './WebViewModal';
 import YahooFinanceLogo from '../../assets/YahooFinance_logo.svg';
 import WebViewEmbedded from './WebViewEmbedded';
+import { ModalProvider, useModal } from '../contexts/ModalContext'; // Adjust the path as necessary
+
 
 const { width } = Dimensions.get('window');
 
@@ -38,7 +40,7 @@ const incrementPageNumber = async () => {
 const Card: React.FC<CardProps> = ({ card }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const [modalVisible, setModalVisible] = useState(false);
+  const { modalVisible, setModalVisible } = useModal();
   const [currentUrl, setCurrentUrl] = useState('');
   const [currentTitle, setCurrentTitle] = useState('');
 
@@ -196,6 +198,8 @@ const StockSwiper = () => {
   // Create a ref to store the Swiper instance
   const swiperRef = useRef<any>(null);
 
+  const { modalVisible, setModalVisible } = useModal();
+
   const [cards, setCards] = useState<Stock[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);  // Initialize currentPage state
@@ -250,6 +254,7 @@ const StockSwiper = () => {
         onSwipedAll={handleSwipedAll}
         cardIndex={0}
         verticalSwipe={false}
+        horizontalSwipe={!modalVisible}
         cardVerticalMargin={0}
         backgroundColor={'#f0f0f0'}
         stackSize={3} // Number of cards visible in background
