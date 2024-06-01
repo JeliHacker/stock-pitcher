@@ -77,7 +77,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }) => {
                         <Ionicons name="close-outline" size={48} color="#999" style={{ marginRight: 15 }} />
                     </TouchableOpacity>
                 </View>
-                <ScrollView style={styles.scrollViewStyle}>
+                <ScrollView style={styles.scrollViewStyle} nestedScrollEnabled={true}>
                     <AccordionItem title="About">
                       <Text style={styles.settingOption}>
                           In Warren Buffett's first TV interview, he describes his style of investing with a baseball analogy. The market pitches you balls (stocks) at different prices, and you can swing when you see a stock selling at an attractive price. However, unlike in baseball, there are no strikes, so you're never forced to swing. Stock Pitcher throws stock ideas at you, which you can save to a watchlist or let them go by.
@@ -96,11 +96,15 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ visible, onClose }) => {
 };
 
 const styles = StyleSheet.create({
-    closeButton: {
+  closeButton: {
         position: 'absolute',
         right: -30, 
         top: -20
-    },
+  },
+  content: {
+    padding: 10,
+    backgroundColor: '#fff',
+  },
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
@@ -108,6 +112,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.3)', // Semi-transparent background
   },
   modalView: {
+    width: '90%',
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 35,
@@ -120,7 +125,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    width: '90%',
     height: '75%',
     maxHeight: '80%'
   },
@@ -131,12 +135,6 @@ const styles = StyleSheet.create({
   scrollViewStyle: {
     width: '100%',
     height: 300,
-  },
-  settingOption: {
-    // Style for each setting option
-    fontSize: 18,
-    padding: 10,
-    // You might want to add borderBottomWidth and borderBottomColor for dividing lines
   },
   settingsTitle: {
     fontSize: 36
@@ -153,9 +151,10 @@ const styles = StyleSheet.create({
       fontSize: 18,
       fontWeight: 'bold',
   },
-  content: {
-      padding: 10,
-      backgroundColor: '#fff',
+  settingOption: {
+    fontSize: 18,
+    padding: 10,
+    // You might want to add borderBottomWidth and borderBottomColor for dividing lines
   },
 });
 

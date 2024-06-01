@@ -1,5 +1,5 @@
 // PlateScreen.js
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useLayoutEffect, useState, useEffect } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Image, TouchableWithoutFeedback } from 'react-native';
 import StockSwiper from '../components/StockSwiper'; 
 import { Ionicons } from '@expo/vector-icons'; 
@@ -9,6 +9,7 @@ import { ModalProvider, useModal } from '../contexts/ModalContext';
 
 const PlateScreen: React.FC<PlateScreenProps> = ({ navigation }) => {
   const [settingsModalVisible, setSettingsModalVisible] = useState(false);
+  
   
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -26,6 +27,10 @@ const PlateScreen: React.FC<PlateScreenProps> = ({ navigation }) => {
       ),
     });
   }, [navigation]);
+
+  useEffect(() => {
+    console.log("platescreen MOUNTING🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️")
+  });
 
   return (
     <View style={styles.container}>

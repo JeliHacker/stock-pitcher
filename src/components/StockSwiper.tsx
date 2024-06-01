@@ -10,8 +10,6 @@ import WebViewEmbedded from './WebViewEmbedded';
 import { ModalProvider, useModal } from '../contexts/ModalContext'; // Adjust the path as necessary
 
 
-const { width } = Dimensions.get('window');
-
 // Function to update the seen stocks
 const updateSeenStocks = async (newStock: any) => {
   const seenStocks = await AsyncStorage.getItem('seenStocks');
@@ -37,23 +35,7 @@ const incrementPageNumber = async () => {
   }
 
 // definition for a card
-const Card: React.FC<CardProps> = ({ card }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const { modalVisible, setModalVisible } = useModal();
-  const [currentUrl, setCurrentUrl] = useState('');
-  const [currentTitle, setCurrentTitle] = useState('');
-
-  const handlePress = (url: string, title: string) => {
-    setCurrentUrl(url);
-    setCurrentTitle(title);
-    setModalVisible(true);
-  };
-
-  const handleCloseModal = () => {
-    setModalVisible(false);
-  };
-
+const CardComponent: React.FC<CardProps> = ({ card }) => {
   const urls = {
     guruFocusInsider: `https://www.gurufocus.com/stock/${card.symbol}/insider`,
     guruFocusDCF: `https://www.gurufocus.com/stock/${card.symbol}/dcf`,
@@ -62,6 +44,33 @@ const Card: React.FC<CardProps> = ({ card }) => {
     edgar: `https://www.sec.gov/edgar/browse/?CIK=1514991&owner=exclude`,
     yahooFinance: `https://finance.yahoo.com/quote/${card.symbol}`,
   };
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const { modalVisible, setModalVisible } = useModal();
+  const [currentUrl, setCurrentUrl] = useState('http://api.codefit.lol/404');
+  const [currentTitle, setCurrentTitle] = useState('');
+  
+  const handlePress = (url: string, title: string) => {
+    setCurrentUrl(url);
+    console.log("handlepress", url);
+    setCurrentTitle(title);
+    setModalVisible(true);
+  };
+
+  const handleCloseModal = () => {
+    console.log("closing modal")
+    setModalVisible(false);
+  };
+
+  useEffect(() => {
+    console.log('Card component mounted or re-rendered');
+  });
+
+  useEffect(() => {
+    console.log('Card useEffect triggered with dependencies');
+    console.log('Modal visible:', modalVisible);
+    console.log('Current URL:', currentUrl);
+  }, [modalVisible, currentUrl]);
 
   const attributes = [
     (
@@ -166,6 +175,8 @@ const Card: React.FC<CardProps> = ({ card }) => {
   );
 };
 
+const Card = React.memo(CardComponent);
+
 const fetchStocks = async (
   page: number,
   setCards: Dispatch<SetStateAction<Stock[]>>,
@@ -207,6 +218,7 @@ const StockSwiper = () => {
   const { saveStock } = useSavedStocks();
 
   useEffect(() => {
+    console.log("PARENT COMPONENT MOUNTING!!!! !!!! PARENT COMPONENT MOUNTING!!!! !!!!  PARENT COMPONENT MOUNTING!!!! !!!!  PARENT COMPONENT MOUNTING!!!! !!!! ")
     setLoading(true); // Set loading before fetching
     getCurrentPage().then(page => {
       setCurrentPage(page);
@@ -244,7 +256,7 @@ const StockSwiper = () => {
       <Swiper
         ref={swiperRef}
         cards={cards}
-        renderCard={(card) => <Card card={card} /> }
+        renderCard={(card) => <CardComponent card={card} /> }
             onSwipedRight={(card) => {
           saveStock(cards[card]);
         }}
@@ -282,7 +294,9 @@ const StockSwiper = () => {
   );
 };
 
+
 // Get the full height of the device screen
+const { width } = Dimensions.get('window');
 const screenHeight = Dimensions.get('window').height;
 
 // Define a percentage of the screen height you want the card to be
@@ -419,7 +433,8 @@ const styles = StyleSheet.create({
     width: 230,
     height: 100,
     zIndex: 100,
-    bottom: '15%'
+    bottom: '15%',
+    borderColor: 'black',
   }
 });
 
