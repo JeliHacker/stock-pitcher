@@ -19,7 +19,7 @@ const WebViewModal: React.FC<WebViewModalProps> = ({ visible, onClose, url, titl
 
   // Effect to reset the WebView when the modal is closed
   useEffect(() => {
-    // console.log("useEffect! webviewmodal", url, "<-- url ");
+    console.log("useEffect! webviewmodal", url, "<-- url ");
     if (!visible) {
       setKey((prevKey) => prevKey + 1); // Increment the key to force re-render
     }
@@ -65,7 +65,7 @@ const WebViewModal: React.FC<WebViewModalProps> = ({ visible, onClose, url, titl
       <View style={styles.modalContentContainer}>
           <TouchableOpacity activeOpacity={1} style={styles.modalContent}>
             <View style={styles.header}>
-              <Text style={styles.title}>{title}</Text>
+              <Text style={styles.title}>{url}</Text>
               <TouchableOpacity onPress={onClose} style={styles.closeButton}>
                 <Text style={styles.closeButtonText}>Close</Text>
               </TouchableOpacity>

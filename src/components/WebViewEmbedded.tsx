@@ -15,9 +15,6 @@ const WebViewEmbedded: React.FC<WebViewModalProps> = ({ onClose, url, title, hei
         <View style={styles.modalContent}>
           <View style={styles.header}>
             <Text style={styles.title}>{title}</Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Text style={styles.closeButtonText}>Close!</Text>
-            </TouchableOpacity>
           </View>
           <WebView originWhitelist={['*']} source={{ uri: url }} style={styles.webView} />
         </View>
@@ -31,11 +28,9 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     justifyContent: 'center',
-    backgroundColor: 'blue'
   },
   modalContent: {
     flex: 1,
-    margin: 20,
     backgroundColor: 'white',
     borderRadius: 10,
     overflow: 'hidden',

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useRef, SetStateAction, Dispatch } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, Dimensions, ScrollView, TouchableWithoutFeedback, TouchableOpacity, Image } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, Dimensions, Pressable, TouchableOpacity, Image } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
 import { useSavedStocks } from '../contexts/SavedStocksContext';
 import { Stock } from '../types/types'; 
@@ -52,25 +52,15 @@ const CardComponent: React.FC<CardProps> = ({ card }) => {
   
   const handlePress = (url: string, title: string) => {
     setCurrentUrl(url);
-    console.log("handlepress", url);
     setCurrentTitle(title);
     setModalVisible(true);
+    console.log("handlepress", url, currentIndex, getModalUrl());
   };
 
   const handleCloseModal = () => {
     console.log("closing modal")
     setModalVisible(false);
   };
-
-  useEffect(() => {
-    console.log('Card component mounted or re-rendered');
-  });
-
-  useEffect(() => {
-    console.log('Card useEffect triggered with dependencies');
-    console.log('Modal visible:', modalVisible);
-    console.log('Current URL:', currentUrl);
-  }, [modalVisible, currentUrl]);
 
   const attributes = [
     (
@@ -116,6 +106,23 @@ const CardComponent: React.FC<CardProps> = ({ card }) => {
     }
   };
 
+  const getModalUrl = () => {
+    switch (currentIndex) {
+      case 0:
+        return urls.yahooFinance;
+      case 1:
+        return urls.guruFocusDCF;
+      case 2:
+        return urls.seekingAlpha;
+      case 3:
+        return urls.edgar;
+      case 4:
+        return urls.guruFocusInsider;
+      default:
+        return '';
+    }
+  };
+
   return ( 
     <View style={styles.card}>
       {/* Tabs */}
@@ -137,7 +144,10 @@ const CardComponent: React.FC<CardProps> = ({ card }) => {
       <View style={styles.center}>
         <Text style={styles.text}>{attributes[currentIndex]}</Text>
       </View>
-      
+      { currentIndex == 0 && modalVisible && 
+      <View style={{ position: 'absolute', width: '100%', zIndex: 999}} >
+                <WebViewEmbedded height={500} onClose={handleCloseModal} url={urls.yahooFinance} title={currentTitle} /></View>
+      }
       {/* All of this is because the links aren't pressable because they are hidden under the left and right touchable opacities */}
       { currentIndex == 0 &&
         <TouchableOpacity style={styles.yahoofinance_logo} onPress={() => handlePress(urls.yahooFinance, 'Yahoo Finance')}>
@@ -145,32 +155,49 @@ const CardComponent: React.FC<CardProps> = ({ card }) => {
           <YahooFinanceLogo width="120" height="40" />
         </TouchableOpacity>
       }
+
       { currentIndex == 1 &&
         <TouchableOpacity style={styles.gurufocus_logo} onPress={() => handlePress(urls.guruFocusDCF, 'GuruFocus')}>
           <Text>View in</Text>
           <Image source={require('../../assets/GuruFocus_logo.png')} width={60} height={30} resizeMode='center' />
         </TouchableOpacity>
       }
+
       { currentIndex == 2 &&
         <TouchableOpacity style={styles.gurufocus_logo} onPress={() => handlePress(urls.seekingAlpha, 'Seeking Alpha')}>
           <Text>View in</Text>
           <Image source={require('../../assets/SeekingAlpha_logo.png')} width={60} height={30} resizeMode='center' />
         </TouchableOpacity>
       }
+
       { currentIndex == 3 &&
         <TouchableOpacity style={styles.gurufocus_logo} onPress={() => handlePress(urls.edgar, 'Seeking Alpha')}>
           <Text>View in</Text>
           <Image source={require('../../assets/SeekingAlpha_logo.png')} width={60} height={30} resizeMode='center' />
         </TouchableOpacity>
       }
+
       { currentIndex == 4 &&
         <TouchableOpacity style={styles.gurufocus_logo} onPress={() => handlePress(urls.guruFocusInsider, 'GuruFocus')}>
           <Text>View in</Text>
           <Image source={require('../../assets/GuruFocus_logo.png')} style={styles.gurufocus_logo} resizeMode='contain' />
         </TouchableOpacity>
       }
+
       
-      <WebViewModal visible={modalVisible} onClose={handleCloseModal} url={currentUrl} title={currentTitle} />
+      { currentIndex == 1 && modalVisible &&
+          <WebViewModal visible={modalVisible} onClose={handleCloseModal} url={urls.guruFocusDCF} title={currentTitle} />
+      }
+      { currentIndex == 2 && modalVisible &&
+          <WebViewModal visible={modalVisible} onClose={handleCloseModal} url={urls.seekingAlpha} title={currentTitle} />
+      }
+      { currentIndex == 3 && modalVisible &&
+          <WebViewModal visible={modalVisible} onClose={handleCloseModal} url={urls.edgar} title={currentTitle} />
+      }
+      { currentIndex == 4 && modalVisible &&
+          <WebViewModal visible={modalVisible} onClose={handleCloseModal} url={urls.guruFocusInsider} title={currentTitle} />
+      }      
+      
     </View>
   );
 };
@@ -432,7 +459,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: 230,
     height: 100,
-    zIndex: 100,
+    zIndex: 1000,
     bottom: '15%',
     borderColor: 'black',
   }
