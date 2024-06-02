@@ -65,7 +65,7 @@ const WebViewModal: React.FC<WebViewModalProps> = ({ visible, onClose, url, titl
       <View style={styles.modalContentContainer}>
           <TouchableOpacity activeOpacity={1} style={styles.modalContent}>
             <View style={styles.header}>
-              <Text style={styles.title}>{url}</Text>
+              <Text style={styles.title}>{title}</Text>
               <TouchableOpacity onPress={onClose} style={styles.closeButton}>
                 <Text style={styles.closeButtonText}>Close</Text>
               </TouchableOpacity>

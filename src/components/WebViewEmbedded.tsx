@@ -15,6 +15,9 @@ const WebViewEmbedded: React.FC<WebViewModalProps> = ({ onClose, url, title, hei
         <View style={styles.modalContent}>
           <View style={styles.header}>
             <Text style={styles.title}>{title}</Text>
+            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
           </View>
           <WebView originWhitelist={['*']} source={{ uri: url }} style={styles.webView} />
         </View>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useRef, SetStateAction, Dispatch } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, Dimensions, Pressable, TouchableOpacity, Image } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, Dimensions, Pressable, TouchableOpacity, Image, Platform } from 'react-native';
 import Swiper from 'react-native-deck-swiper';
 import { useSavedStocks } from '../contexts/SavedStocksContext';
 import { Stock } from '../types/types'; 
@@ -128,12 +128,16 @@ const CardComponent: React.FC<CardProps> = ({ card }) => {
       {/* Tabs */}
       <View style={styles.tabsContainer}>
       {attributes.map((_, index) => (
-          <View
+          <Pressable
             key={index}
             style={[
               styles.tab,
               currentIndex == index && styles.activeTab,
             ]}
+            onPress={() => {
+              console.log('tab pressed', index);
+              setCurrentIndex(index);
+            }}
           />
         ))}
       </View>
@@ -145,43 +149,49 @@ const CardComponent: React.FC<CardProps> = ({ card }) => {
         <Text style={styles.text}>{attributes[currentIndex]}</Text>
       </View>
       { currentIndex == 0 && modalVisible && 
-      <View style={{ position: 'absolute', width: '100%', zIndex: 999}} >
-                <WebViewEmbedded height={500} onClose={handleCloseModal} url={urls.yahooFinance} title={currentTitle} /></View>
+      <View style={{ position: 'absolute', top: 34, width: '100%', zIndex: 101}} >
+        <WebViewEmbedded height={cardHeight - 34} onClose={handleCloseModal} url={urls.yahooFinance} title={currentTitle} />
+      </View>
       }
       {/* All of this is because the links aren't pressable because they are hidden under the left and right touchable opacities */}
       { currentIndex == 0 &&
-        <TouchableOpacity style={styles.yahoofinance_logo} onPress={() => handlePress(urls.yahooFinance, 'Yahoo Finance')}>
-          <Text>View in</Text>
+        <Pressable 
+          style={({ pressed }) => [
+            styles.linkContainer,       
+            { opacity: pressed ? 0.5 : 1.0 }  // UI feedback to being pressed
+          ]} 
+          onPress={() => handlePress(urls.yahooFinance, 'Yahoo Finance')}>
+          <Text style={styles.linkText}>View in </Text>
           <YahooFinanceLogo width="120" height="40" />
-        </TouchableOpacity>
+        </Pressable>
       }
 
       { currentIndex == 1 &&
-        <TouchableOpacity style={styles.gurufocus_logo} onPress={() => handlePress(urls.guruFocusDCF, 'GuruFocus')}>
-          <Text>View in</Text>
-          <Image source={require('../../assets/GuruFocus_logo.png')} width={60} height={30} resizeMode='center' />
+        <TouchableOpacity style={styles.linkContainer} onPress={() => handlePress(urls.guruFocusDCF, 'GuruFocus')}>
+          <Text style={styles.linkText}>View in</Text>
+          <Image source={require('../../assets/GuruFocus_logo.png')} style={styles.gurufocus_logo_image} resizeMode='contain' />
         </TouchableOpacity>
       }
 
       { currentIndex == 2 &&
-        <TouchableOpacity style={styles.gurufocus_logo} onPress={() => handlePress(urls.seekingAlpha, 'Seeking Alpha')}>
-          <Text>View in</Text>
-          <Image source={require('../../assets/SeekingAlpha_logo.png')} width={60} height={30} resizeMode='center' />
+        <TouchableOpacity style={styles.linkContainer} onPress={() => handlePress(urls.seekingAlpha, 'Seeking Alpha')}>
+          <Text style={styles.linkText}>View in</Text>
+          <Image source={require('../../assets/SeekingAlpha_logo.png')} style={styles.gurufocus_logo_image} resizeMode='center' />
         </TouchableOpacity>
       }
 
       { currentIndex == 3 &&
-        <TouchableOpacity style={styles.gurufocus_logo} onPress={() => handlePress(urls.edgar, 'Seeking Alpha')}>
-          <Text>View in</Text>
-          <Image source={require('../../assets/SeekingAlpha_logo.png')} width={60} height={30} resizeMode='center' />
+        <TouchableOpacity style={styles.linkContainer} onPress={() => handlePress(urls.edgar, 'Seeking Alpha')}>
+          <Text style={styles.linkText}>View in</Text>
+          <Image source={require('../../assets/SeekingAlpha_logo.png')} style={styles.gurufocus_logo_image} resizeMode='center' />
         </TouchableOpacity>
       }
 
       { currentIndex == 4 &&
-        <TouchableOpacity style={styles.gurufocus_logo} onPress={() => handlePress(urls.guruFocusInsider, 'GuruFocus')}>
-          <Text>View in</Text>
-          <Image source={require('../../assets/GuruFocus_logo.png')} style={styles.gurufocus_logo} resizeMode='contain' />
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.linkContainer} onPress={() => handlePress(urls.guruFocusInsider, 'GuruFocus')}>
+            <Text style={styles.linkText}>View in</Text>
+            <Image source={require('../../assets/GuruFocus_logo.png')} style={styles.gurufocus_logo_image} resizeMode='contain' />
+          </TouchableOpacity>
       }
 
       
@@ -245,7 +255,6 @@ const StockSwiper = () => {
   const { saveStock } = useSavedStocks();
 
   useEffect(() => {
-    console.log("PARENT COMPONENT MOUNTING!!!! !!!! PARENT COMPONENT MOUNTING!!!! !!!!  PARENT COMPONENT MOUNTING!!!! !!!!  PARENT COMPONENT MOUNTING!!!! !!!! ")
     setLoading(true); // Set loading before fetching
     getCurrentPage().then(page => {
       setCurrentPage(page);
@@ -294,6 +303,7 @@ const StockSwiper = () => {
         cardIndex={0}
         verticalSwipe={false}
         horizontalSwipe={!modalVisible}
+        cardHorizontalMargin={0}
         cardVerticalMargin={0}
         backgroundColor={'#f0f0f0'}
         stackSize={3} // Number of cards visible in background
@@ -334,7 +344,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'limegreen',
     borderColor: 'limegreen',
     borderWidth: 2,
-    padding: 1,
+    opacity: 1
   },
   arrow: {
     fontSize: 36,
@@ -342,11 +352,9 @@ const styles = StyleSheet.create({
   },
   attributeContainer: {
     alignItems: 'center',
-  },
-  center: {
+    width: width - 20,
+    flexGrow: 1,
     flex: 1,
-    alignItems: 'center',
-    zIndex: 0,
   },
   button: {
     width: 60, // Diameter of the circle
@@ -357,16 +365,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center', // Center the text vertically
     alignItems: 'center', // Center the text horizontally
     marginHorizontal: 10, // Add space between the buttons
+    backgroundColor: 'white'
   },
   buttonContainer: {
-    position: 'absolute', // Position your button container absolutely
-    bottom: 50, // Adjust this value to place it above the navigation bar
-    alignSelf: 'center', // Center the button container horizontally
-    flexDirection: 'row', // Layout buttons horizontally
-    justifyContent: 'space-around', // Space out buttons as desired
-    width: '100%', // Full width to allow space-around to work
+    position: 'absolute', 
+    bottom: 0, 
+    alignSelf: 'center', 
+    flexDirection: 'row', 
+    justifyContent: 'space-around', 
+    width: '90%', 
+    padding: 10, 
+    backgroundColor: 'rgba(220, 220, 220, 0.5)', // 'gainsboro' with 50% opacity
+    borderRadius: 20, 
+    borderColor: 'gray', 
+    overflow: 'hidden',
   },
   card: {
+    width: width,
     height: cardHeight,
     borderRadius: 8,
     borderWidth: 2,
@@ -375,14 +390,38 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'white',
   },
+  center: {
+    flex: 1,
+    alignItems: 'center',
+    zIndex: 0,
+  },
   container: {
     flex: 1,
+    justifyContent: 'center',  
+    alignItems: 'center',
     backgroundColor: '#235643'
   },
   imageStyles: {
     width: 30,
     height: 30,
     resizeMode: 'contain'
+  },
+  linkContainer: {
+    position: 'absolute',
+    zIndex: 100,
+    flexDirection: 'row',  // Align items in a row
+    justifyContent: 'center',  // Center items horizontally
+    alignItems: 'center',  // Center items vertically
+    padding: 10,  // Add padding inside the button
+    backgroundColor: 'rgba(50, 205, 50, 1)',  // Light grey background
+    borderRadius: 5,  // Rounded corners
+    borderWidth: 1,  // Border width
+    borderColor: '#D0D0D0',  // Border color
+    alignSelf: 'center',  // Center the button within its parent
+  },
+  linkText: {
+    color: 'white', 
+    fontSize: 20
   },
   passButton: {
     backgroundColor: 'red',
@@ -411,18 +450,28 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     borderRadius: 10,
     borderColor: 'black',
+    opacity: 0.6,
     borderWidth: 2,
-    padding: 1,
+    padding: 5,
+    zIndex: 101
   },
   text: {
+    fontFamily: 'Roboto',
     textAlign: 'center',
     fontSize: 24,
     backgroundColor: 'transparent',
+    ...Platform.select({
+      android: {
+        flexWrap: 'wrap',
+        flexShrink: 1,
+      }, // Limit text to a single line
+    }),
+    
   },
   leftSide: {
     position: 'absolute',
     left: 0,
-    top: 0,
+    top: 34,
     bottom: 0,
     width: width / 2,
     justifyContent: 'center',
