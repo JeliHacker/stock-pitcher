@@ -148,11 +148,7 @@ const CardComponent: React.FC<CardProps> = ({ card }) => {
       <View style={styles.center}>
         <Text style={styles.text}>{attributes[currentIndex]}</Text>
       </View>
-      { currentIndex == 0 && modalVisible && 
-      <View style={{ position: 'absolute', top: 34, width: '100%', zIndex: 101}} >
-        <WebViewEmbedded height={cardHeight - 34} onClose={handleCloseModal} url={urls.yahooFinance} title={currentTitle} />
-      </View>
-      }
+      
       {/* All of this is because the links aren't pressable because they are hidden under the left and right touchable opacities */}
       { currentIndex == 0 &&
         <Pressable 
@@ -194,19 +190,43 @@ const CardComponent: React.FC<CardProps> = ({ card }) => {
           </TouchableOpacity>
       }
 
-      
-      { currentIndex == 1 && modalVisible &&
-          <WebViewModal visible={modalVisible} onClose={handleCloseModal} url={urls.guruFocusDCF} title={currentTitle} />
-      }
-      { currentIndex == 2 && modalVisible &&
-          <WebViewModal visible={modalVisible} onClose={handleCloseModal} url={urls.seekingAlpha} title={currentTitle} />
-      }
-      { currentIndex == 3 && modalVisible &&
-          <WebViewModal visible={modalVisible} onClose={handleCloseModal} url={urls.edgar} title={currentTitle} />
-      }
-      { currentIndex == 4 && modalVisible &&
-          <WebViewModal visible={modalVisible} onClose={handleCloseModal} url={urls.guruFocusInsider} title={currentTitle} />
-      }      
+      <View style={[{ position: 'absolute', top: 34, width: '100%', height: '100%', zIndex: 101 }, modalVisible ? {} : {display: 'none'}]}>
+        <WebViewEmbedded
+          height={cardHeight}
+          onClose={handleCloseModal}
+          url={urls.yahooFinance}
+          title="Yahoo Finance"
+          style={currentIndex === 0 ? {} : { display: 'none' }}
+        />
+        <WebViewEmbedded
+          height={cardHeight}
+          onClose={handleCloseModal}
+          url={urls.guruFocusDCF}
+          title="GuruFocus DCF"
+          style={currentIndex === 1 ? {} : { display: 'none' }}
+        />
+        <WebViewEmbedded
+          height={cardHeight}
+          onClose={handleCloseModal}
+          url={urls.seekingAlpha}
+          title="Seeking Alpha"
+          style={currentIndex === 2 ? {} : { display: 'none' }}
+        />
+        <WebViewEmbedded
+          height={cardHeight}
+          onClose={handleCloseModal}
+          url={urls.edgar}
+          title="Edgar"
+          style={currentIndex === 3 ? {} : { display: 'none' }}
+        />
+        <WebViewEmbedded
+          height={cardHeight}
+          onClose={handleCloseModal}
+          url={urls.guruFocusInsider}
+          title="GuruFocus Insider"
+          style={currentIndex === 4 ? {} : { display: 'none' }}
+        />
+      </View>
       
     </View>
   );
@@ -373,7 +393,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center', 
     flexDirection: 'row', 
     justifyContent: 'space-around', 
-    width: '90%', 
+    width: '100%', 
     padding: 10, 
     backgroundColor: 'rgba(220, 220, 220, 0.5)', // 'gainsboro' with 50% opacity
     borderRadius: 20, 
@@ -401,6 +421,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#235643'
   },
+  gurufocus_logo: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 100,
+    height: 100,
+    zIndex: 100,
+    bottom: '15%'
+  },
+  gurufocus_logo_image: {
+    width: 100,
+    height: 100,
+  },
   imageStyles: {
     width: 30,
     height: 30,
@@ -419,6 +452,16 @@ const styles = StyleSheet.create({
     borderColor: '#D0D0D0',  // Border color
     alignSelf: 'center',  // Center the button within its parent
   },
+  leftSide: {
+    position: 'absolute',
+    left: 0,
+    top: 34,
+    bottom: 0,
+    width: width / 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+  },
   linkText: {
     color: 'white', 
     fontSize: 20
@@ -431,6 +474,16 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 32, // Adjust the size as needed
   },
+  rightSide: {
+    position: 'absolute',
+    right: 0,
+    top: 34,
+    bottom: 0,
+    width: width / 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+  },
   swingButtonText: {
     color: 'white',
     fontSize: 32, // Adjust the size as needed
@@ -440,12 +493,12 @@ const styles = StyleSheet.create({
   },
   tabsContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
     padding: 10,
   },
   tab: {
-    width: 55,
-    height: 2,
+    flex: 1,
     backgroundColor: 'black',
     marginHorizontal: 5,
     borderRadius: 10,
@@ -467,39 +520,6 @@ const styles = StyleSheet.create({
       }, // Limit text to a single line
     }),
     
-  },
-  leftSide: {
-    position: 'absolute',
-    left: 0,
-    top: 34,
-    bottom: 0,
-    width: width / 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1,
-  },
-  rightSide: {
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    bottom: 0,
-    width: width / 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1,
-  },
-  gurufocus_logo: {
-    position: 'absolute',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 100,
-    height: 100,
-    zIndex: 100,
-    bottom: '15%'
-  },
-  gurufocus_logo_image: {
-    width: 100,
-    height: 100,
   },
   yahoofinance_logo: {
     position: 'absolute',
