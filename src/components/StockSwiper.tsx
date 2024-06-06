@@ -47,6 +47,7 @@ const CardComponent: React.FC<CardProps> = ({ card }) => {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const { modalVisible, setModalVisible } = useModal();
+  const [embeddedWebViewVisible, setEmbeddedWebViewVisible] = useState(false);
   const [currentUrl, setCurrentUrl] = useState('http://api.codefit.lol/404');
   const [currentTitle, setCurrentTitle] = useState('');
   
@@ -57,16 +58,25 @@ const CardComponent: React.FC<CardProps> = ({ card }) => {
     console.log("handlepress", url, currentIndex, getModalUrl());
   };
 
+  const pressEmbeddedLink = () => {
+    setEmbeddedWebViewVisible(true);
+  };
+
   const handleCloseModal = () => {
-    console.log("closing modal")
     setModalVisible(false);
+  };
+
+  const handleCloseEmbedded = () => {
+    setEmbeddedWebViewVisible(false);
   };
 
   const attributes = [
     (
       <View style={styles.attributeContainer}>
-        <Text style={styles.text}>{card.symbol}</Text>
+        <Text style={styles.headerText}>{card.symbol}</Text>
         <Text style={styles.text}>Name: {card.name}</Text>
+        <Text style={styles.text}>Market Cap: {card.market_cap}</Text>
+        <Text style={styles.text}>Country: {card.country}</Text>
       </View>
     ),
     (
@@ -115,7 +125,7 @@ const CardComponent: React.FC<CardProps> = ({ card }) => {
       case 2:
         return urls.seekingAlpha;
       case 3:
-        return urls.edgar;
+        return urls.seekingAlphaFilings;
       case 4:
         return urls.guruFocusInsider;
       default:
@@ -135,7 +145,6 @@ const CardComponent: React.FC<CardProps> = ({ card }) => {
               currentIndex == index && styles.activeTab,
             ]}
             onPress={() => {
-              console.log('tab pressed', index);
               setCurrentIndex(index);
             }}
           />
@@ -156,7 +165,7 @@ const CardComponent: React.FC<CardProps> = ({ card }) => {
             styles.linkContainer,       
             { opacity: pressed ? 0.5 : 1.0 }  // UI feedback to being pressed
           ]} 
-          onPress={() => handlePress(urls.yahooFinance, 'Yahoo Finance')}>
+          onPress={pressEmbeddedLink}>
           <Text style={styles.linkText}>View in </Text>
           <YahooFinanceLogo width="120" height="40" />
         </Pressable>
@@ -177,7 +186,7 @@ const CardComponent: React.FC<CardProps> = ({ card }) => {
       }
 
       { currentIndex == 3 &&
-        <TouchableOpacity style={styles.linkContainer} onPress={() => handlePress(urls.edgar, 'Seeking Alpha')}>
+        <TouchableOpacity style={styles.linkContainer} onPress={() => handlePress(urls.seekingAlphaFilings, 'Seeking Alpha')}>
           <Text style={styles.linkText}>View in</Text>
           <Image source={require('../../assets/SeekingAlpha_logo.png')} style={styles.gurufocus_logo_image} resizeMode='center' />
         </TouchableOpacity>
@@ -190,43 +199,28 @@ const CardComponent: React.FC<CardProps> = ({ card }) => {
           </TouchableOpacity>
       }
 
-      <View style={[{ position: 'absolute', top: 34, width: '100%', height: '100%', zIndex: 101 }, modalVisible ? {} : {display: 'none'}]}>
+      <View style={[{ position: 'absolute', top: 34, width: '100%', height: '100%', zIndex: 101 }, embeddedWebViewVisible ? {} : {display: 'none'}]}>
         <WebViewEmbedded
           height={cardHeight}
-          onClose={handleCloseModal}
+          onClose={handleCloseEmbedded}
           url={urls.yahooFinance}
           title="Yahoo Finance"
           style={currentIndex === 0 ? {} : { display: 'none' }}
         />
-        <WebViewEmbedded
-          height={cardHeight}
-          onClose={handleCloseModal}
-          url={urls.guruFocusDCF}
-          title="GuruFocus DCF"
-          style={currentIndex === 1 ? {} : { display: 'none' }}
-        />
-        <WebViewEmbedded
-          height={cardHeight}
-          onClose={handleCloseModal}
-          url={urls.seekingAlpha}
-          title="Seeking Alpha"
-          style={currentIndex === 2 ? {} : { display: 'none' }}
-        />
-        <WebViewEmbedded
-          height={cardHeight}
-          onClose={handleCloseModal}
-          url={urls.edgar}
-          title="Edgar"
-          style={currentIndex === 3 ? {} : { display: 'none' }}
-        />
-        <WebViewEmbedded
-          height={cardHeight}
-          onClose={handleCloseModal}
-          url={urls.guruFocusInsider}
-          title="GuruFocus Insider"
-          style={currentIndex === 4 ? {} : { display: 'none' }}
-        />
       </View>
+
+      { currentIndex == 1 && modalVisible &&
+          <WebViewModal visible={modalVisible} onClose={handleCloseModal} url={urls.guruFocusDCF} title={currentTitle} />
+      }
+      { currentIndex == 2 && modalVisible &&
+          <WebViewModal visible={modalVisible} onClose={handleCloseModal} url={urls.seekingAlpha} title={currentTitle} />
+      }
+      { currentIndex == 3 && modalVisible &&
+          <WebViewModal visible={modalVisible} onClose={handleCloseModal} url={urls.seekingAlphaFilings} title={currentTitle} />
+      }
+      { currentIndex == 4 && modalVisible &&
+          <WebViewModal visible={modalVisible} onClose={handleCloseModal} url={urls.guruFocusInsider} title={currentTitle} />
+      }      
       
     </View>
   );
@@ -247,11 +241,14 @@ const fetchStocks = async (
     .then(data => {
       const newStocks = data.filter((stock: any) => !seenStocks.includes(stock.symbol));
       setCards(newStocks.map((stock: any) => ({
+        country: stock.country,
         symbol: stock.symbol,
         name: stock.name,
         fair_value: stock.fair_value,
         business_predictability: stock.business_predictability,
-        price: stock.last_sale
+        price: stock.last_sale,
+        market_cap: stock.market_cap,
+
       })));
       setLoading(false);
     })
@@ -267,6 +264,8 @@ const StockSwiper = () => {
   const swiperRef = useRef<any>(null);
 
   const { modalVisible, setModalVisible } = useModal();
+
+  const anyModalVisible = modalVisible; // TODO: add embedded visibility OR statement
 
   const [cards, setCards] = useState<Stock[]>([]);
   const [loading, setLoading] = useState(true);
@@ -322,11 +321,11 @@ const StockSwiper = () => {
         onSwipedAll={handleSwipedAll}
         cardIndex={0}
         verticalSwipe={false}
-        horizontalSwipe={!modalVisible}
+        horizontalSwipe={!anyModalVisible}
         cardHorizontalMargin={0}
         cardVerticalMargin={0}
         backgroundColor={'#f0f0f0'}
-        stackSize={3} // Number of cards visible in background
+        stackSize={2} // Number of cards visible in background
         key={currentPage}
       />
 
@@ -434,6 +433,9 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
   },
+  headerText: {
+    fontSize: 24,
+  },
   imageStyles: {
     width: 30,
     height: 30,
@@ -511,7 +513,7 @@ const styles = StyleSheet.create({
   text: {
     fontFamily: 'Roboto',
     textAlign: 'center',
-    fontSize: 24,
+    fontSize: 14,
     backgroundColor: 'transparent',
     ...Platform.select({
       android: {
@@ -519,7 +521,6 @@ const styles = StyleSheet.create({
         flexShrink: 1,
       }, // Limit text to a single line
     }),
-    
   },
   yahoofinance_logo: {
     position: 'absolute',

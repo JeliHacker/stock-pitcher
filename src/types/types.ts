@@ -1,11 +1,13 @@
 // src/types/types.ts
 
 export interface Stock {
+    country: string,
     business_predictability: number;
     symbol: string;
     name: string;
     fair_value: string;
     price: string;
+    market_cap: string;
   }
 
 

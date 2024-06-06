@@ -19,7 +19,6 @@ const WebViewModal: React.FC<WebViewModalProps> = ({ visible, onClose, url, titl
 
   // Effect to reset the WebView when the modal is closed
   useEffect(() => {
-    console.log("useEffect! webviewmodal", url, "<-- url ");
     if (!visible) {
       setKey((prevKey) => prevKey + 1); // Increment the key to force re-render
     }

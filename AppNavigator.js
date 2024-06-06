@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { View, Text } from 'react-native';
 import { FontAwesome, FontAwesome6 } from '@expo/vector-icons';
 import PlateScreen from './src/screens/PlateScreen'; 
@@ -10,6 +11,7 @@ const Tab = createBottomTabNavigator();
 
 const AppNavigator = () => {
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <NavigationContainer>
       <Tab.Navigator
         screenOptions={({ route }) => ({
@@ -45,6 +47,7 @@ const AppNavigator = () => {
         />
       </Tab.Navigator>
     </NavigationContainer>
+    </GestureHandlerRootView>
   );
 };
 

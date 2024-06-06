@@ -1,13 +1,40 @@
 // SavedScreen.js
 import React, { useState, useEffect, useLayoutEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; 
 import { useSavedStocks } from '../contexts/SavedStocksContext'; 
 import SettingsModal from '../components/SettingsModal';
 import { SavedScreenProps, Stock } from '../types/types';
+import { Swipeable } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
+  const { removeStock } = useSavedStocks();
   const [settingsModalVisible, setSettingsModalVisible] = useState(false);
+
+  
+  const renderRightActions = (
+    progress: Animated.AnimatedInterpolation<number>,
+    dragX: Animated.AnimatedInterpolation<number>,
+    stock: Stock
+  ): React.ReactNode => {
+    const translateX = dragX.interpolate({
+      inputRange: [-100, 0],
+      outputRange: [0, 100],
+      extrapolate: 'clamp',
+    });
+  
+    const onPress = () => {
+      removeStock(stock.symbol)
+    };
+    return (
+      <Animated.View style={[styles.deleteButton, { transform: [{ translateX }] }]}>
+        <TouchableOpacity onPress={onPress} style={styles.deleteButton}>
+          <Text style={styles.deleteButtonText}>Delete</Text>
+        </TouchableOpacity>
+      </Animated.View>
+    );
+  };
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -58,15 +85,19 @@ const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
 
   const renderItem = ({ item }: { item: Stock }) => {
     return (
-      <View style={styles.row}>
-        <View style={styles.leftContainer}>
-          <Text style={styles.ticker}>{item.symbol}</Text>
-          <Text style={styles.companyName} numberOfLines={1} ellipsizeMode='tail'>{item.name}</Text>
+      <Swipeable
+        renderRightActions={(progress, dragX) => renderRightActions(progress, dragX, item)}
+      >
+        <View style={styles.row}>
+          <View style={styles.leftContainer}>
+            <Text style={styles.ticker}>{item.symbol}</Text>
+            <Text style={styles.companyName} numberOfLines={1} ellipsizeMode='tail'>{item.name}</Text>
+          </View>
+          <View style={styles.rightContainer}>
+            <Text style={styles.price}>${stockPrices[item.symbol] || '...'}</Text>
+          </View>
         </View>
-        <View style={styles.rightContainer}>
-          <Text style={styles.price}>${stockPrices[item.symbol] || '...'}</Text>
-        </View>
-      </View>
+      </Swipeable>
     );
   };
 
@@ -117,6 +148,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#000', // White color for the price
   },
+  deleteButton: {
+    backgroundColor: 'red',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 100,
+    height: '100%',
+  },
+  deleteButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  }
 });
 
 export default SavedScreen;
