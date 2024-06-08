@@ -31,7 +31,7 @@ const WebViewEmbedded: React.FC<WebViewModalProps> = ({ onClose, url, title, hei
                 <Text style={styles.closeButtonText}>Close</Text>
               </TouchableOpacity>
           </View>
-          <WebView ref={webViewRef} originWhitelist={['*']} source={{ uri: url }} style={styles.webView} />
+          <WebView nestedScrollEnabled ref={webViewRef} originWhitelist={['*']} source={{ uri: url }} style={styles.webView} />
         </View>
       </View>
     

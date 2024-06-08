@@ -79,6 +79,7 @@ const WebViewModal: React.FC<WebViewModalProps> = ({ visible, onClose, url, titl
               </View>
             ) : (
               <WebView
+                nestedScrollEnabled
                 key={key}
                 ref={webViewRef}
                 source={{ uri: url }}
