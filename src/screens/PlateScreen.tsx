@@ -28,10 +28,6 @@ const PlateScreen: React.FC<PlateScreenProps> = ({ navigation }) => {
     });
   }, [navigation]);
 
-  useEffect(() => {
-    console.log("platescreen MOUNTING🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️🍽️")
-  });
-
   return (
     <View style={styles.container}>
       <SettingsModal

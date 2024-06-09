@@ -59,7 +59,7 @@ const CardComponent: React.FC<CardProps> = ({ card }) => {
   };
 
   const pressEmbeddedLink = () => {
-    setEmbeddedWebViewVisible(true);
+    setModalVisible(true);
   };
 
   const handleCloseModal = () => {
@@ -70,35 +70,70 @@ const CardComponent: React.FC<CardProps> = ({ card }) => {
     setEmbeddedWebViewVisible(false);
   };
 
+  const formatMarketCap = (marketCapString: string): string => {
+    const marketCap = parseFloat(marketCapString);
+    if (isNaN(marketCap)) {
+      return "Market Cap: N/A"; // Handle the case where market cap is not a valid number
+    }
+
+    if (marketCap >= 1000000000) {
+      const marketCapInBillions = marketCap / 1000000000;
+      return `$${marketCapInBillions.toFixed(1)}B`; // display market cap in billions
+    } else if (marketCap >= 1000000) {
+      const marketCapInMillions = marketCap / 1000000;
+      return `$${marketCapInMillions.toFixed(1)}M`; // display market cap in millions
+    } else {
+      return `$${marketCap}`; // Handle smaller market caps directly
+    }
+  };
+
+  const formattedMarketCap = formatMarketCap(card.market_cap);
+
   const attributes = [
     (
       <View style={styles.attributeContainer}>
-        <Text style={styles.headerText}>{card.symbol}</Text>
-        <Text style={styles.text}>Name: {card.name}</Text>
-        <Text style={styles.text}>Market Cap: {card.market_cap}</Text>
-        <Text style={styles.text}>Country: {card.country}</Text>
+        <Text style={styles.headerText}>{card.symbol} ${card.price}</Text>
+          <Text style={styles.miniHeader}>Name</Text>
+          <Text style={styles.text}>{card.name}</Text>
+
+          <Text style={styles.miniHeader}>Market Cap</Text>
+          <Text style={[styles.text]}>{formattedMarketCap}</Text>
+
+          <Text style={styles.miniHeader}>Country</Text>
+          <Text style={styles.text}>{card.country}</Text>
+
+          <Text style={styles.miniHeader}>Industry</Text>
+          <Text style={styles.text}>{card.industry}</Text>
       </View>
     ),
     (
       <View style={styles.attributeContainer}>
-        <Text>Valuation</Text>
-        <Text style={styles.text}>Business Predictability: {card.business_predictability}</Text>
-        <Text style={styles.text}>Fair Value: {card.fair_value}</Text>
+        <Text style={styles.headerText}>{card.symbol} ${card.price}</Text>
+        
+        <Text style={styles.miniHeader}>Business Predictability</Text>
+        <Text style={styles.text}>{card.business_predictability}</Text>
+
+        <Text style={styles.miniHeader}>Fair Value</Text>
+        <Text style={styles.text}>${card.fair_value}</Text>
       </View>
     ),
     (
       <View style={styles.attributeContainer}>
+        <Text style={styles.headerText}>{card.symbol} ${card.price}</Text>
         <Text style={styles.text}>Symbol: {card.symbol}</Text>
         <Text style={styles.text}>Price: {card.price}</Text>
+        
       </View>
     ),
     (
       <View style={styles.attributeContainer}>
+        <Text style={styles.headerText}>{card.symbol} ${card.price}</Text>
         <Text style={styles.text}>Financial Reports</Text>
       </View>
     ),
     (
       <View style={styles.attributeContainer}>
+        <Text style={styles.headerText}>{card.symbol} ${card.price}</Text>
         <Text style={styles.text}>Insider Buying</Text>
       </View>
     ),
@@ -173,36 +208,36 @@ const CardComponent: React.FC<CardProps> = ({ card }) => {
 
       { currentIndex == 1 &&
         <TouchableOpacity style={styles.linkContainer} onPress={() => handlePress(urls.guruFocusDCF, 'GuruFocus')}>
-          <Text style={styles.linkText}>View in</Text>
+          <Text style={styles.linkText}>View in </Text>
           <Image source={require('../../assets/GuruFocus_logo.png')} style={styles.gurufocus_logo_image} resizeMode='contain' />
         </TouchableOpacity>
       }
 
       { currentIndex == 2 &&
         <TouchableOpacity style={styles.linkContainer} onPress={() => handlePress(urls.seekingAlpha, 'Seeking Alpha')}>
-          <Text style={styles.linkText}>View in</Text>
+          <Text style={styles.linkText}>View in </Text>
           <Image source={require('../../assets/SeekingAlpha_logo.png')} style={styles.gurufocus_logo_image} resizeMode='center' />
         </TouchableOpacity>
       }
 
       { currentIndex == 3 &&
         <TouchableOpacity style={styles.linkContainer} onPress={() => handlePress(urls.seekingAlphaFilings, 'Seeking Alpha')}>
-          <Text style={styles.linkText}>View in</Text>
+          <Text style={styles.linkText}>View in </Text>
           <Image source={require('../../assets/SeekingAlpha_logo.png')} style={styles.gurufocus_logo_image} resizeMode='center' />
         </TouchableOpacity>
       }
 
       { currentIndex == 4 &&
           <TouchableOpacity style={styles.linkContainer} onPress={() => handlePress(urls.guruFocusInsider, 'GuruFocus')}>
-            <Text style={styles.linkText}>View in</Text>
+            <Text style={styles.linkText}>View in </Text>
             <Image source={require('../../assets/GuruFocus_logo.png')} style={styles.gurufocus_logo_image} resizeMode='contain' />
           </TouchableOpacity>
       }
 
-      <View style={[{ position: 'absolute', top: 34, width: '100%', height: '100%', zIndex: 101 }, embeddedWebViewVisible ? {} : {display: 'none'}]}>
+      <View style={[{ position: 'absolute', top: 34, width: '100%', height: '100%', zIndex: 101 }, modalVisible ? {} : {display: 'none'}]}>
         <WebViewEmbedded
           height={cardHeight}
-          onClose={handleCloseEmbedded}
+          onClose={handleCloseModal}
           url={urls.yahooFinance}
           title="Yahoo Finance"
           style={currentIndex === 0 ? {} : { display: 'none' }}
@@ -241,14 +276,14 @@ const fetchStocks = async (
     .then(data => {
       const newStocks = data.filter((stock: any) => !seenStocks.includes(stock.symbol));
       setCards(newStocks.map((stock: any) => ({
-        country: stock.country,
-        symbol: stock.symbol,
-        name: stock.name,
-        fair_value: stock.fair_value,
         business_predictability: stock.business_predictability,
-        price: stock.last_sale,
+        country: stock.country,
+        fair_value: stock.fair_value,
+        industry: stock.industry,
         market_cap: stock.market_cap,
-
+        name: stock.name,
+        price: stock.last_sale,
+        symbol: stock.symbol,
       })));
       setLoading(false);
     })
@@ -370,7 +405,6 @@ const styles = StyleSheet.create({
     color: '#ccc',
   },
   attributeContainer: {
-    alignItems: 'center',
     width: width - 20,
     flexGrow: 1,
     flex: 1,
@@ -434,7 +468,8 @@ const styles = StyleSheet.create({
     height: 100,
   },
   headerText: {
-    fontSize: 24,
+    fontSize: 36,
+    marginBottom: 10
   },
   imageStyles: {
     width: 30,
@@ -442,7 +477,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain'
   },
   linkContainer: {
-    position: 'absolute',
+    bottom: 75,
     zIndex: 100,
     flexDirection: 'row',  // Align items in a row
     justifyContent: 'center',  // Center items horizontally
@@ -468,13 +503,16 @@ const styles = StyleSheet.create({
     color: 'white', 
     fontSize: 20
   },
+  miniHeader: {
+    color: 'grey',
+    fontSize: 18
+  },
   passButton: {
     backgroundColor: 'red',
     color: '#000'
   },
   passButtonText: {
-    color: 'black',
-    fontSize: 32, // Adjust the size as needed
+    fontSize: 32, 
   },
   rightSide: {
     position: 'absolute',
@@ -487,11 +525,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   swingButtonText: {
-    color: 'white',
-    fontSize: 32, // Adjust the size as needed
-  },
-  swingButton: {
-    backgroundColor: 'green',
+    fontSize: 32, 
   },
   tabsContainer: {
     flexDirection: 'row',
@@ -512,8 +546,8 @@ const styles = StyleSheet.create({
   },
   text: {
     fontFamily: 'Roboto',
-    textAlign: 'center',
-    fontSize: 14,
+    fontSize: 18,
+    marginBottom: 10,
     backgroundColor: 'transparent',
     ...Platform.select({
       android: {
