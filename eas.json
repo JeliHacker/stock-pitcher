@@ -19,7 +19,6 @@
     "preview": {
       "distribution": "internal",
       "ios": {
-        "simulator": true,
         "enterpriseProvisioning": "adhoc"
       }
     },
