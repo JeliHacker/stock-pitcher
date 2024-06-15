@@ -341,6 +341,12 @@ const StockSwiper = () => {
     }
   };
 
+  const handleBackPress = () => {
+    if (swiperRef.current) {
+      swiperRef.current.swipeBack();
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Swiper
@@ -361,6 +367,7 @@ const StockSwiper = () => {
         cardVerticalMargin={0}
         backgroundColor={'#f0f0f0'}
         stackSize={2} // Number of cards visible in background
+        swipeBackCard
         key={currentPage}
       />
 
@@ -373,6 +380,12 @@ const StockSwiper = () => {
           onPress={handlePassPress}
         >
           <Text style={styles.passButtonText}>❌</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button,{marginHorizontal: 0, width: 40, height: 40}]}
+          onPress={handleBackPress}
+        >
+          <Text style={[styles.passButtonText,{fontSize: 16}]}>⏪</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.button]}
@@ -424,6 +437,7 @@ const styles = StyleSheet.create({
     position: 'absolute', 
     bottom: 0, 
     alignSelf: 'center', 
+    alignItems: 'center',
     flexDirection: 'row', 
     justifyContent: 'space-around', 
     width: '100%', 

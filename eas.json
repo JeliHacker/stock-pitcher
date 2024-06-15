@@ -3,14 +3,32 @@
     "version": ">= 8.0.0"
   },
   "build": {
+    "adhoc": {
+      "distribution": "internal",
+      "ios": {
+        "enterpriseProvisioning": "adhoc"
+      }
+    },
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "ios": {
+        "enterpriseProvisioning": "adhoc"
+      }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "ios": {
+        "simulator": true,
+        "enterpriseProvisioning": "adhoc"
+      }
     },
-    "production": {}
+    "production": {
+      "distribution": "store",
+      "ios": {
+        "enterpriseProvisioning": "adhoc"
+      }
+    }
   },
   "submit": {
     "production": {}
