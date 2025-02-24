@@ -63,7 +63,7 @@ const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
       setLoading(true);
       let newStockPrices: StockPrices = {};
       for (const stock of savedStocks) {
-        const url = `http://api.codefit.lol/stocks/${stock.symbol}`;
+        const url = `https://api.codefit.lol/stocks/${stock.symbol}`;
         try {
           const response = await fetch(url);
           const data = await response.json();
@@ -71,7 +71,7 @@ const SavedScreen: React.FC<SavedScreenProps> = ({ navigation }) => {
             newStockPrices[stock.symbol] = parseFloat(data.last_sale).toFixed(2);
           }
         } catch (error) {
-          console.error('Error fetching stock data for', stock.symbol, ':', error);
+          console.error('Error fetching stock data for', stock.symbol, ':', error, typeof(error),);
         }
       }
       setStockPrices(newStockPrices);

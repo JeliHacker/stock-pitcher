@@ -36,6 +36,11 @@ const incrementPageNumber = async () => {
 
 // definition for a card
 const CardComponent: React.FC<CardProps> = ({ card }) => {
+  if (card == null) {
+    return <View>
+      <Text>Null card</Text>
+    </View>
+  }
   const urls = {
     guruFocusInsider: `https://www.gurufocus.com/stock/${card.symbol}/insider`,
     guruFocusDCF: `https://www.gurufocus.com/stock/${card.symbol}/dcf`,
@@ -48,7 +53,7 @@ const CardComponent: React.FC<CardProps> = ({ card }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const { modalVisible, setModalVisible } = useModal();
   const [embeddedWebViewVisible, setEmbeddedWebViewVisible] = useState(false);
-  const [currentUrl, setCurrentUrl] = useState('http://api.codefit.lol/404');
+  const [currentUrl, setCurrentUrl] = useState('https://api.codefit.lol/404');
   const [currentTitle, setCurrentTitle] = useState('');
   
   const handlePress = (url: string, title: string) => {
@@ -271,7 +276,7 @@ const fetchStocks = async (
   const currentPage = await getCurrentPage();
   const seenStocks = JSON.parse(await AsyncStorage.getItem('seenStocks') || '[]');
 
-  fetch(`http://api.codefit.lol/stocks?page=${currentPage}`)
+  fetch(`https://api.codefit.lol/stocks?page=${currentPage}`)
     .then(response => response.json())
     .then(data => {
       const newStocks = data.filter((stock: any) => !seenStocks.includes(stock.symbol));
